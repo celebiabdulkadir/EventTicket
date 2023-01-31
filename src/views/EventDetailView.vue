@@ -46,7 +46,7 @@
 				categoryList.value = res?.data?.data?.event_categories;
 				setTimeout(() => {
 					spinnerOpen.value = false;
-				}, 2000);
+				}, 1000);
 			})
 			.catch((error) => $toast.error(error.message));
 	});

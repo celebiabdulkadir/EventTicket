@@ -9,6 +9,8 @@
 	const $toast = useToast();
 
 	const seatPlan = ref([]);
+
+	const newSeatPlan = ref([]);
 	const route = useRoute();
 	const router = useRouter();
 	const spinnerOpen = ref(false);
@@ -18,13 +20,15 @@
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
+	const occupy = (id, row) => {
+		const filteredSeatPlan = newSeatPlan.value.find((item) => item.rows == row);
 
-	const occupy = (id) => {
-		seatPlan.value[id - 1].Active = !seatPlan.value[id - 1].Active;
+		filteredSeatPlan.seats[id - 1].Active =
+			!filteredSeatPlan.seats[id - 1].Active;
 	};
 	const occupiedSeats = computed(() => {
 		var newSeats = [];
-		newSeats = seatPlan.value.filter(function (e) {
+		newSeats = newSeatPlan.value.filter(function (e) {
 			return e.Active;
 		});
 
@@ -38,6 +42,31 @@
 		updateEventState('totalPrice', total);
 		return total;
 	});
+
+	const getRows = () => {
+		const rows = seatPlan.value.map((element) => element.row);
+		let uniqueRows = [...new Set(rows)];
+		let newArray = [];
+
+		for (let i = 0; i < uniqueRows.length; i++) {
+			let seats = [];
+
+			let newObj = {
+				rows,
+				seats: seats,
+			};
+			newArray.push(newObj);
+			for (let j = 0; j < seatPlan.value.length; j++) {
+				if (uniqueRows[i] == seatPlan.value[j].row) {
+					seats.push(seatPlan.value[j]);
+
+					newObj.rows = seatPlan.value[j].row;
+				}
+			}
+		}
+		newSeatPlan.value = newArray;
+		return newArray;
+	};
 
 	const goToPayment = () => {
 		if (store.state.seats.length > 0) {
@@ -64,6 +93,7 @@
 				element.Active = false;
 			}
 			seatPlan.value = res.data.data;
+			getRows();
 
 			setTimeout(() => {
 				spinnerOpen.value = false;
@@ -82,25 +112,28 @@
 		</div>
 		<div class="flex flex-row justify-center">
 			<div
+				v-for="item in newSeatPlan"
 				class="flex relative flex-row flex-start align-middle items-center justify-center m-2 p-2 flex-wrap max-w-[350px]"
 			>
-				<div v-for="item in seatPlan" class="cursor-pointer">
-					<div class="m-2 p-2">
-						<button
-							:disabled="item.isBooked"
-							@click="occupy(item.id)"
-							class="text-white font-bold py-2 px-4 rounded ml-3"
-							:class="[
-								!item.isBooked
-									? 'bg-gray-200 contrast-125 text-stone-600'
-									: 'bg-gray-600 contrast-125',
-								!item.Active
-									? 'bg-green-200 contrast-125 text-stone-600'
-									: 'bg-green-600 contrast-125',
-							]"
-						>
-							{{ item.seat }}-{{ item.row }}
-						</button>
+				<div v-for="seat in item.seats">
+					<div class="cursor-pointer">
+						<div class="m-2 p-2">
+							<button
+								:disabled="seat.isBooked"
+								@click="occupy(seat.id, seat.row)"
+								class="text-white font-bold py-2 px-4 rounded ml-3"
+								:class="[
+									!seat.isBooked
+										? 'bg-gray-200 contrast-125 text-stone-600'
+										: 'bg-gray-600 contrast-125',
+									!seat.Active
+										? 'bg-green-200 contrast-125 text-stone-600'
+										: 'bg-green-600 contrast-125',
+								]"
+							>
+								{{ seat.seat }}-{{ seat.row }}
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -116,6 +149,8 @@
 				ticket price{{ store.state.price }}
 			</p>
 		</div>
+
+		{{ getRows() }}
 
 		<div class="flex justify-center">
 			<div class="flex flex-col justify-center align-middle items-center">

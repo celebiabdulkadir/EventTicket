@@ -16,12 +16,10 @@ const router = createRouter({
 		{
 			path: '/event-detail',
 			name: 'event-detail',
-			props: { default: true, sidebar: false },
 			component: EventDetailView,
 		},
 		{
 			path: '/event-detail/event-seat-plan',
-			props: { default: true, sidebar: false },
 			name: 'seatPlan',
 			component: () => import('../views/SeatPlanView.vue'),
 		},
@@ -51,13 +49,13 @@ router.beforeEach((to, from) => {
 	if (to.path === '/paymentsuccess' && store.state.cc_number.length < 1) {
 		return router.push('/');
 	}
-	if (to.name === 'event-detail' && store.state.eventId.length == '') {
+	if (to.name === 'event-detail' && store.state.eventId == '') {
 		return router.push('/');
 	}
 
 	if (
 		to.path === '/event-detail/event-seat-plan' &&
-		store.state.eventCategoryId.length == ''
+		store.state.eventCategoryId == ''
 	) {
 		return router.push('/');
 	}
