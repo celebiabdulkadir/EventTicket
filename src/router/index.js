@@ -3,6 +3,7 @@ import EventsView from '../views/EventsView.vue';
 import PaymentSuccessView from '../views/PaymentSuccessView.vue';
 import NotFoundPage from '../views/NotFoundPage.vue';
 import EventDetailView from '../views/EventDetailView.vue';
+import store from '../store';
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,13 +14,13 @@ const router = createRouter({
 			component: EventsView,
 		},
 		{
-			path: '/event-detail/:id',
+			path: '/event-detail',
 			name: 'event-detail',
 			props: { default: true, sidebar: false },
 			component: EventDetailView,
 		},
 		{
-			path: '/event-detail/:eventId/:eventCategoryId',
+			path: '/event-detail/event-seat-plan',
 			props: { default: true, sidebar: false },
 			name: 'seatPlan',
 			component: () => import('../views/SeatPlanView.vue'),
@@ -40,6 +41,26 @@ const router = createRouter({
 			component: NotFoundPage,
 		},
 	],
+});
+
+router.beforeEach((to, from) => {
+	if (to.path === '/payment' && store.state.seats.length < 1) {
+		return router.push('/');
+	}
+
+	if (to.path === '/paymentsuccess' && store.state.cc_number.length < 1) {
+		return router.push('/');
+	}
+	if (to.name === 'event-detail' && store.state.eventId.length == '') {
+		return router.push('/');
+	}
+
+	if (
+		to.path === '/event-detail/event-seat-plan' &&
+		store.state.eventCategoryId.length == ''
+	) {
+		return router.push('/');
+	}
 });
 
 export default router;

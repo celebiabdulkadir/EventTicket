@@ -3,10 +3,15 @@
 	import { onMounted, ref, computed } from 'vue';
 	import { useRoute, useRouter } from 'vue-router';
 	import { Store, useStore } from 'vuex';
+	import { useToast } from 'vue-toast-notification';
+	import Spinner from '../components/Spinner.vue';
+	import 'vue-toast-notification/dist/theme-sugar.css';
+	const $toast = useToast();
 
 	const seatPlan = ref([]);
 	const route = useRoute();
 	const router = useRouter();
+	const spinnerOpen = ref(false);
 
 	const store = useStore();
 
@@ -36,121 +41,96 @@
 
 	const goToPayment = () => {
 		if (store.state.seats.length > 0) {
-			router.push(`/payment`);
+			spinnerOpen.value = true;
+
+			setTimeout(() => {
+				spinnerOpen.value = false;
+				router.push(`/payment`);
+
+				$toast.success('Seat selection completed!');
+			}, 3000);
+		} else {
+			$toast.error('Please select seat');
 		}
 	};
 
-	console.log(seatPlan.value);
-	const goHome = () => {
-		router.push(`/`);
-	};
 	onMounted(() => {
+		spinnerOpen.value = true;
 		Service.getSeatPlan(
-			route?.params?.eventId,
-			route?.params?.eventCategoryId
+			store?.state?.eventId,
+			store.state.eventCategoryId
 		).then((res) => {
 			for (const element of res.data.data) {
 				element.Active = false;
 			}
 			seatPlan.value = res.data.data;
+
+			setTimeout(() => {
+				spinnerOpen.value = false;
+			}, 2000);
 		});
 	});
 </script>
 
 <template>
-	<div>
-		<div>PLEASE SELECT SEAT OR SEATS</div>
-		<div class="flex justify-center">
-			<div class="mb-3 xl:w-96"></div>
-		</div>
-
-		<ul>
-			<li v-for="seat in occupiedSeats">{{ seat.seat }} {{ seat.row }}</li>
-		</ul>
+	<div class="bg-indigo-100 relative">
 		<div
-			class="flex flex-row flex-start align-middle justify-center m-2 p-2 h-1/2 flex-wrap"
+			v-if="spinnerOpen"
+			class="absolute bg-indigo-200 opacity-80 w-full h-full"
 		>
-			<div v-for="item in seatPlan" class="cursor-pointer">
-				<div class="flex flex-col flex-wrap m-2 p-2">
-					<button
-						:disabled="item.isBooked"
-						@click="occupy(item.id)"
-						class="text-white font-bold py-2 px-4 rounded ml-3"
-						:class="[
-							!item.isBooked
-								? 'bg-gray-200 contrast-125 text-stone-600'
-								: 'bg-gray-600 contrast-125',
-							!item.Active
-								? 'bg-green-200 contrast-125 text-stone-600'
-								: 'bg-green-600 contrast-125',
-						]"
-					>
-						{{ item.seat }}
-					</button>
+			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
+		</div>
+		<div class="flex flex-row justify-center">
+			<div
+				class="flex relative flex-row flex-start align-middle items-center justify-center m-2 p-2 flex-wrap max-w-[350px]"
+			>
+				<div v-for="item in seatPlan" class="cursor-pointer">
+					<div class="m-2 p-2">
+						<button
+							:disabled="item.isBooked"
+							@click="occupy(item.id)"
+							class="text-white font-bold py-2 px-4 rounded ml-3"
+							:class="[
+								!item.isBooked
+									? 'bg-gray-200 contrast-125 text-stone-600'
+									: 'bg-gray-600 contrast-125',
+								!item.Active
+									? 'bg-green-200 contrast-125 text-stone-600'
+									: 'bg-green-600 contrast-125',
+							]"
+						>
+							{{ item.seat }}-{{ item.row }}
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div>
-			<p>TOTAL PRICE</p>
-			<p class="align-center font-bold">{{ calculateTotal }} TL</p>
-		</div>
-		<div class="flex flex-end justify-end">
-			<button
-				@click="goToPayment"
-				class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-			>
-				Pay
-			</button>
-			<p v-if="!occupiedSeats">Please select seats</p>
+		<div class="flex flex-col flex-start">
+			<div class="flex flex-row justify-center align-middle items-center">
+				<p>Seats</p>
+				<p class="mr-2" v-for="seat in occupiedSeats">
+					{{ seat.seat }}-{{ seat.row }},
+				</p>
+			</div>
+			<p class="flex flex-row justify-center align-middle items-center">
+				ticket price{{ store.state.price }}
+			</p>
 		</div>
 
-		<!-- <input type="text" v-model="store.state.eventCategoryId" /> -->
+		<div class="flex justify-center">
+			<div class="flex flex-col justify-center align-middle items-center">
+				<p class="underlined decoration-solid text-center">
+					TOTAL PRICE : <span>{{ calculateTotal }} TL</span>
+				</p>
+			</div>
+			<button
+				@click="goToPayment"
+				class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold p-4 m-4 rounded"
+			>
+				Go to payment
+			</button>
+		</div>
 	</div>
 </template>
 
-<style scoped>
-	.circle {
-		border: 2px solid white;
-		border-radius: 70%;
-		/* background: lightgreen; */
-		opacity: 50%;
-		color: white;
-		width: 40px;
-		height: 40px;
-		text-align: center;
-		/* line-height: 100px; */
-	}
-
-	.clicked {
-		background-color: green;
-	}
-
-	.seat {
-		width: 100px;
-		height: 100px;
-		display: inline-block;
-		border: 1px solid black;
-		text-align: center;
-		padding: 30px 10px;
-		margin-right: 10px;
-	}
-
-	.seat-avail {
-		background-color: rgb(230, 225, 225);
-	}
-
-	.seat-unavail {
-		background-color: rgb(58, 62, 60);
-	}
-
-	.seats {
-		display: flex;
-		flex-direction: row;
-	}
-	/* .circleBos {
-		background-color: green;
-	}
-	.circleDolu {
-		background-color: red;
-	} */
-</style>
+<style scoped></style>
