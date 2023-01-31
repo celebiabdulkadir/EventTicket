@@ -3,6 +3,11 @@
 	import { computed, ref } from 'vue';
 	import Service from '../service';
 	import router from '../router';
+	import { useToast } from 'vue-toast-notification';
+	import Spinner from '../components/Spinner.vue';
+	import 'vue-toast-notification/dist/theme-sugar.css';
+	const $toast = useToast();
+	const spinnerOpen = ref(false);
 	const cardNumber = ref('');
 	const emailValue = ref('');
 	const cvvNum = ref('');
@@ -30,10 +35,7 @@
 	const securityCodeValid = computed(() => {
 		return /^[0-9]{3,4}$/.test(cvvNum.value);
 	});
-	const calculateTicketPrice = () => {
-		const result = seats.lenght.calculateTicketPrice;
-		return result;
-	};
+
 	const isFormValid = computed(() => {
 		if (
 			creditCardValid.value &&
@@ -62,8 +64,7 @@
 		e.preventDefault();
 
 		if (isFormValid) {
-			console.log(store.state);
-
+			spinnerOpen.value = true;
 			Service.completePayment({
 				eventId: store.state.eventId,
 				eventCategoryId: store.state.eventCategoryId,
@@ -77,12 +78,16 @@
 				cc_exp_cvv: store.state.cc_exp_cvv,
 			})
 				.then((res) => {
-					console.log(res.data.message);
 					if (res.data.message == 'Biletiniz başarıyla oluşturuldu.') {
-						setTimeout(router.push('/paymentsuccess'), 5000);
+						setTimeout(router.push('/paymentsuccess'), 3000);
+						$toast.success('Payment successfully completed!');
+						spinnerOpen.value = false;
 					}
 				})
-				.catch((error) => console.log(error));
+				.catch((error) => {
+					$toast.error(error.message);
+					console.log(error);
+				});
 		}
 	};
 </script>
@@ -90,8 +95,14 @@
 <template>
 	<form
 		@submit="submitHandler"
-		class="min-w-screen min-h-screen bg-gray-200 flex items-center justify-center px-5 pb-10 pt-16"
+		class="min-w-screen min-h-screen relative bg-gray-200 flex items-center justify-center px-5 pb-10 pt-16"
 	>
+		<div
+			v-if="spinnerOpen"
+			class="absolute bg-indigo-100 opacity-70 w-full h-full"
+		>
+			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
+		</div>
 		<div
 			class="w-full mx-auto rounded-lg bg-white shadow-lg p-5 text-gray-700"
 			style="max-width: 600px"
