@@ -1,14 +1,16 @@
 <script setup>
 	import { RouterLink, RouterView } from 'vue-router';
+	import FooterComp from './components/FooterComp.vue';
 	import HeaderComp from './components/HeaderComp.vue';
 </script>
 
 <template>
-	<nav class="flex items-center justify-between flex-wrap bg-indigo-500 p-6">
+	<nav class="flex-wrap bg-indigo-500 p-6">
 		<HeaderComp></HeaderComp>
 	</nav>
-	<transition name="slide" mode="out-in"> </transition>
 	<RouterView />
+
+	<FooterComp></FooterComp>
 </template>
 
 <style>

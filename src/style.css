@@ -5,11 +5,22 @@
 button:disabled,
 button[disabled] {
 	border: 1px solid #999999;
-	background-color: hsl(0, 4%, 55%);
+	background-color: hwb(0 75% 23%);
 	/* color: #6d6666; */
 	cursor: auto;
 	opacity: 30;
 }
 button:disabled:hover {
 	opacity: 60;
+}
+#app {
+	position: relative;
+	min-height: 100vh;
+}
+body {
+	@apply bg-indigo-100;
+}
+#footer {
+	position: fixed;
+	bottom: 0;
 }

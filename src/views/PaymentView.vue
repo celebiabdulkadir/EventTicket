@@ -78,11 +78,11 @@
 				cc_exp_cvv: store.state.cc_exp_cvv,
 			})
 				.then((res) => {
-					if (res.data.message == 'Biletiniz başarıyla oluşturuldu.') {
-						setTimeout(router.push('/paymentsuccess'), 3000);
-						$toast.success('Payment successfully completed!');
-						spinnerOpen.value = false;
-					}
+					router.push('/paymentsuccess');
+
+					$toast.success('Payment successfully completed!');
+
+					spinnerOpen.value = false;
 				})
 				.catch((error) => {
 					$toast.error(error.message);

@@ -6,6 +6,8 @@
 	import { useToast } from 'vue-toast-notification';
 	import Spinner from '../components/Spinner.vue';
 	import 'vue-toast-notification/dist/theme-sugar.css';
+	import moment from 'moment';
+
 	const $toast = useToast();
 
 	const eventDetails = ref([]);
@@ -26,6 +28,7 @@
 	const findPrice = async () => {
 		const category = categoryList.value.find((x) => x.id == categoryId.value);
 		updateEventState('price', category.price);
+		updateEventState('eventCategoryName', category.name);
 		updateEventState('eventCategoryId', categoryId.value);
 	};
 
@@ -43,6 +46,7 @@
 		Service.getEventDetailPage(store.state.eventId)
 			.then((res) => {
 				eventDetails.value = res?.data?.data;
+
 				categoryList.value = res?.data?.data?.event_categories;
 				setTimeout(() => {
 					spinnerOpen.value = false;
@@ -66,11 +70,30 @@
 			class="desktop:mx-2 desktop:my-2 desktop:max-w-[500px] mobile:w-full h-full mobile:p-2 mobile:h-full"
 		>
 			<div>
-				<h1 class="mt-2 mb-6 font-bold">{{ eventDetails?.title }}</h1>
+				<h1 class="mt-2 mb-6 font-bold text-xl">{{ eventDetails?.title }}</h1>
 			</div>
 
-			<p class="mb-6">{{ eventDetails?.description }}</p>
+			<p class="mb-6">{{ eventDetails.description }}</p>
 			<div><img :src="eventDetails?.image_url" alt="" class="" /></div>
+
+			<div class="mb-6" v-if="!eventDetails?.image_url">
+				<img class="object-fill w-84" src="default_picture.png" alt="" />
+			</div>
+			<!-- <div class="pt-4 pb-2">
+				<font-awesome-icon class="mr-2" icon="fa-solid fa-map-location" />
+				<span class="font-bold">{{ eventDetails.venue['name'] }}</span>
+				<span class="ml-6 block">{{ eventDetails.venue['address'] }}</span>
+			</div> -->
+			<p class="">
+				<font-awesome-icon class="mr-2" icon="fa-solid fa-calendar-days" />
+				<span>
+					{{ moment(eventDetails.event_date).format('DD-MM-YYYY') }}
+				</span>
+			</p>
+			<p class="mr-4 inline-block pt-6">
+				<font-awesome-icon class="mr-2" icon="fa-solid fa-stopwatch" />
+				<span> {{ moment(eventDetails.event_date).format('hh-mm') }} </span>
+			</p>
 
 			<div class="flex flex-col my-4 desktop:w-[500px] mobile:w-full">
 				<label class="my-2" for="category">Select a category</label>
@@ -80,7 +103,7 @@
 					id=""
 					v-model="categoryId"
 					placeholder="Please choose an option"
-					@change="findPrice()"
+					@change="findPrice"
 				>
 					<option
 						v-for="item in eventDetails?.event_categories"

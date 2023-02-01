@@ -20,21 +20,15 @@
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
-	const occupy = (id, row) => {
-		const filteredSeatPlan = newSeatPlan.value.find((item) => item.rows == row);
 
-		filteredSeatPlan.seats[id - 1].Active =
-			!filteredSeatPlan.seats[id - 1].Active;
-	};
 	const occupiedSeats = computed(() => {
-		var newSeats = [];
-		newSeats = newSeatPlan.value.filter(function (e) {
-			return e.Active;
-		});
+		const seats = newSeatPlan.value.map((element) => element.seats);
 
-		updateEventState('seats', newSeats);
+		const newArray = seats.flat().filter((seat) => seat.Active);
 
-		return newSeats;
+		updateEventState('seats', newArray);
+
+		return newArray;
 	});
 
 	const calculateTotal = computed(() => {
@@ -65,6 +59,7 @@
 			}
 		}
 		newSeatPlan.value = newArray;
+		console.log(newSeatPlan.value);
 		return newArray;
 	};
 
@@ -103,67 +98,132 @@
 </script>
 
 <template>
-	<div class="bg-indigo-100 relative">
+	<div
+		class="bg-indigo-100 min-h-[60vh] desktop:px-16 relative w-full flex desktop:flex-row mobile:flex-col align-middle items-center mobile:justify-center desktop:justify-center space-x-28"
+	>
 		<div
 			v-if="spinnerOpen"
 			class="absolute bg-indigo-200 opacity-80 w-full h-full"
 		>
 			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
 		</div>
-		<div class="flex flex-row justify-center">
-			<div
-				v-for="item in newSeatPlan"
-				class="flex relative flex-row flex-start align-middle items-center justify-center m-2 p-2 flex-wrap max-w-[350px]"
-			>
-				<div v-for="seat in item.seats">
-					<div class="cursor-pointer">
-						<div class="m-2 p-2">
-							<button
-								:disabled="seat.isBooked"
-								@click="occupy(seat.id, seat.row)"
-								class="text-white font-bold py-2 px-4 rounded ml-3"
-								:class="[
-									!seat.isBooked
-										? 'bg-gray-200 contrast-125 text-stone-600'
-										: 'bg-gray-600 contrast-125',
-									!seat.Active
-										? 'bg-green-200 contrast-125 text-stone-600'
-										: 'bg-green-600 contrast-125',
-								]"
-							>
-								{{ seat.seat }}-{{ seat.row }}
-							</button>
+		<div
+			class="flex flex-row min-h-[30vh] align-middle overflow-x-auto overscroll-auto items-center bg-white rounded-md shadow-3xl"
+		>
+			<div class="justify-center flex flex-col w-full overscroll-auto">
+				<h1 class="text-center my-2 font-bold text-xl">Seat Selection</h1>
+				<div
+					v-for="item in newSeatPlan"
+					v-if="newSeatPlan.length > 0"
+					class="flex flex-row flex-start a m-2 p-2"
+					:key="item.rows"
+				>
+					<div class="flex flex-row">
+						<p
+							class="font-bold justify-center items-center py-4 px-4 ml-2 text-xl"
+						>
+							{{ item.rows }}
+						</p>
+						<div class="flex flex-row justify-center items-center">
+							<div v-for="seat in item.seats" :key="seat.id">
+								<div class="cursor-pointer">
+									<button
+										:disabled="seat.isBooked"
+										@click="seat.Active = !seat.Active"
+										class="text-white font-bold py-2 px-2 rounded-full w-12 m-2"
+										:class="[
+											!seat.isBooked
+												? 'bg-gray-200 contrast-125 text-stone-600'
+												: 'bg-gray-600 contrast-125',
+											!seat.Active
+												? 'bg-green-200 contrast-125 text-stone-600'
+												: 'bg-green-600 contrast-125',
+										]"
+									>
+										{{ seat.seat }}
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-col flex-start">
-			<div class="flex flex-row justify-center align-middle items-center">
-				<p>Seats</p>
-				<p class="mr-2" v-for="seat in occupiedSeats">
-					{{ seat.seat }}-{{ seat.row }},
-				</p>
-			</div>
-			<p class="flex flex-row justify-center align-middle items-center">
-				ticket price{{ store.state.price }}
-			</p>
-		</div>
+		<div
+			:class="[occupiedSeats.length > 0 ? 'min-h-[45vh]' : 'min-h-[32vh]']"
+			class="flex flex-col align-middle justify-start min-h-[45vh] desktop:w-96 mobile:w-full bg-white rounded-md my-8 shadow-3xl"
+		>
+			<div class="flex flex-col justify-start mx-4">
+				<h1 class="my-2 font-bold text-xl mx-4">
+					Tickets
+					<span v-if="occupiedSeats.length > 0"
+						>({{ occupiedSeats.length }})</span
+					>
+				</h1>
 
-		{{ getRows() }}
+				<div
+					v-if="occupiedSeats.length > 0"
+					class="flex flex-row min-h-[20vh] desktop:w-96 mobile:min-w-72 flex-wrap justify-start"
+				>
+					<div class="ml-2" v-for="seat in occupiedSeats">
+						<button
+							class="text-white bg-indigo-500 font-bold rounded p-2 m-2"
+							@click="seat.Active = !seat.Active"
+						>
+							{{ seat.seat }}-{{ seat.row }}
+						</button>
+					</div>
+				</div>
 
-		<div class="flex justify-center">
-			<div class="flex flex-col justify-center align-middle items-center">
-				<p class="underlined decoration-solid text-center">
-					TOTAL PRICE : <span>{{ calculateTotal }} TL</span>
-				</p>
+				<div
+					v-if="occupiedSeats.length < 1"
+					class="flex flex-row min-h-[20vh] desktop:w-96 mobile:min-w-72 flex-wrap justify-center align-middle items-center"
+				>
+					<div class="mx-4">
+						<div class="justify-center flex mb-2">
+							<font-awesome-icon
+								style="color: #6366f1; font-size: 3rem"
+								icon="fa-solid fa-ticket"
+							/>
+						</div>
+						<p class="font-bold text-center">
+							You haven't chosen any tickets yet.
+						</p>
+						<p class="text-sm text-center">You can choose your tickets now.</p>
+					</div>
+				</div>
 			</div>
-			<button
-				@click="goToPayment"
-				class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold p-4 m-4 rounded"
-			>
-				Go to payment
-			</button>
+			<div class="mx-4" v-if="occupiedSeats.length > 0">
+				<div>
+					<p class="flex mx-4 flex-row justify-between font-bold">
+						<span class="inline-block font-normal">Ticket Category : </span>
+						<span class="inline-block">
+							{{ store.state.eventCategoryName }}</span
+						>
+					</p>
+				</div>
+				<div class="mx-4">
+					<p class="flex flex-row justify-between mb-12 font-bold">
+						<span class="inline-block font-normal">Ticket Price : </span>
+						<span class="inline-block"> {{ store.state.price }} TL</span>
+					</p>
+				</div>
+				<div class="flex flex-col justify-center align-middle mx-4 min-w-[20%]">
+					<p class="underlined flex flex-row justify-between font-bold text-lg">
+						<span class="inline-block">Total Price:</span>
+						<span class="inline-block">{{ calculateTotal }} TL</span>
+					</p>
+				</div>
+
+				<div class="flex justify-center">
+					<button
+						@click="goToPayment"
+						class="bg-indigo-500 w-full hover:bg-indigo-700 text-white font-bold p-4 m-4 rounded"
+					>
+						Go to Payment
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>

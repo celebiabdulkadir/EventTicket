@@ -4,6 +4,7 @@ const store = createStore({
 	state: {
 		eventId: '',
 		eventCategoryId: '',
+		eventCategoryName: '',
 		seats: [],
 		customer_name: '',
 		customer_surname: '',
@@ -23,6 +24,7 @@ const store = createStore({
 			state = {
 				eventId: '',
 				eventCategoryId: '',
+				eventCategoryName: '',
 				seats: [],
 				customer_name: '',
 				customer_surname: '',
