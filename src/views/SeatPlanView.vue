@@ -20,21 +20,15 @@
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
-	const occupy = (id, row) => {
-		const filteredSeatPlan = newSeatPlan.value.find((item) => item.rows == row);
 
-		filteredSeatPlan.seats[id - 1].Active =
-			!filteredSeatPlan.seats[id - 1].Active;
-	};
 	const occupiedSeats = computed(() => {
-		var newSeats = [];
-		newSeats = newSeatPlan.value.filter(function (e) {
-			return e.Active;
-		});
+		const seats = newSeatPlan.value.map((element) => element.seats);
 
-		updateEventState('seats', newSeats);
+		const newArray = seats.flat().filter((seat) => seat.Active);
 
-		return newSeats;
+		updateEventState('seats', newArray);
+
+		return newArray;
 	});
 
 	const calculateTotal = computed(() => {
@@ -65,6 +59,7 @@
 			}
 		}
 		newSeatPlan.value = newArray;
+		console.log(newSeatPlan.value);
 		return newArray;
 	};
 
@@ -103,57 +98,77 @@
 </script>
 
 <template>
-	<div class="bg-indigo-100 relative">
+	<div class="bg-indigo-100 relative w-full">
 		<div
 			v-if="spinnerOpen"
 			class="absolute bg-indigo-200 opacity-80 w-full h-full"
 		>
 			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
 		</div>
-		<div class="flex flex-row justify-center">
-			<div
-				v-for="item in newSeatPlan"
-				class="flex relative flex-row flex-start align-middle items-center justify-center m-2 p-2 flex-wrap max-w-[350px]"
-			>
-				<div v-for="seat in item.seats">
-					<div class="cursor-pointer">
-						<div class="m-2 p-2">
-							<button
-								:disabled="seat.isBooked"
-								@click="occupy(seat.id, seat.row)"
-								class="text-white font-bold py-2 px-4 rounded ml-3"
-								:class="[
-									!seat.isBooked
-										? 'bg-gray-200 contrast-125 text-stone-600'
-										: 'bg-gray-600 contrast-125',
-									!seat.Active
-										? 'bg-green-200 contrast-125 text-stone-600'
-										: 'bg-green-600 contrast-125',
-								]"
-							>
-								{{ seat.seat }}-{{ seat.row }}
-							</button>
+		<div
+			class="flex flex-row justify-center min-h-[50vh] w-full align-middle items-center"
+		>
+			<div class="justify-center flex flex-col w-full">
+				<div
+					v-for="item in newSeatPlan"
+					v-if="newSeatPlan.length > 0"
+					class="flex flex-row flex-start align-middle items-center justify-center m-2 p-2"
+					:key="item.rows"
+				>
+					<div class="flex flex-row">
+						<p
+							class="font-bold justify-center items-center py-4 px-4 ml-2 text-2xl"
+						>
+							{{ item.rows }}
+						</p>
+						<div class="flex flex-row justify-center items-center">
+							<div v-for="seat in item.seats" :key="seat.id">
+								<div class="cursor-pointer">
+									<button
+										:disabled="seat.isBooked"
+										@click="seat.Active = !seat.Active"
+										class="text-white font-bold py-2 px-4 rounded-full m-2"
+										:class="[
+											!seat.isBooked
+												? 'bg-gray-200 contrast-125 text-stone-600'
+												: 'bg-gray-600 contrast-125',
+											!seat.Active
+												? 'bg-green-200 contrast-125 text-stone-600'
+												: 'bg-green-600 contrast-125',
+										]"
+									>
+										{{ seat.seat }}
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-col flex-start">
-			<div class="flex flex-row justify-center align-middle items-center">
-				<p>Seats</p>
-				<p class="mr-2" v-for="seat in occupiedSeats">
-					{{ seat.seat }}-{{ seat.row }},
-				</p>
+		<div class="flex flex-col justify-end">
+			<div class="flex flex-col justify-end flex-wrap">
+				<p class="font-bold p-2">SELECTED SEATS</p>
+
+				<div class="flex flex-row flex-wrap min-h-[3vh]">
+					<div class="mr-2" v-for="seat in occupiedSeats">
+						<button class="text-white bg-indigo-500 font-bold rounded">
+							{{ seat.seat }}-{{ seat.row }}
+						</button>
+					</div>
+				</div>
 			</div>
+		</div>
+		<div>
 			<p class="flex flex-row justify-center align-middle items-center">
-				ticket price{{ store.state.price }}
+				ticket price{{ store.state.price }} TL
 			</p>
 		</div>
 
-		{{ getRows() }}
-
 		<div class="flex justify-center">
-			<div class="flex flex-col justify-center align-middle items-center">
+			<div
+				class="flex flex-col justify-center align-middle items-center min-w-[20%]"
+			>
 				<p class="underlined decoration-solid text-center">
 					TOTAL PRICE : <span>{{ calculateTotal }} TL</span>
 				</p>
