@@ -22,7 +22,7 @@
 	const handleClick = (id) => {
 		updateEventState('eventId', id);
 
-		if (store.state.eventId) {
+		if (id !== undefined || id !== null || id !== '') {
 			router.push('/event-detail');
 		}
 	};
@@ -62,6 +62,10 @@
 					:src="item.image_url"
 					alt="event-photo"
 				/>
+			</div>
+
+			<div class="mb-6" v-if="!item?.image_url">
+				<img class="object-fill w-84" src="default_picture.png" alt="" />
 			</div>
 
 			<div class="px-6 pt-4 pb-2 text-2xl font-bold">
