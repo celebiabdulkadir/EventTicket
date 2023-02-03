@@ -6,14 +6,18 @@
 	import { useToast } from 'vue-toast-notification';
 	import Spinner from '../components/Spinner.vue';
 	import 'vue-toast-notification/dist/theme-sugar.css';
+	import 'vue-select/dist/vue-select.css';
+
 	import moment from 'moment';
 
 	const $toast = useToast();
 
 	const eventDetails = ref([]);
+
+	const eventVenue = ref();
 	const spinnerOpen = ref(false);
 
-	const categoryId = ref();
+	const categoryId = ref([]);
 
 	const categoryList = ref([]);
 
@@ -24,35 +28,48 @@
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
-
-	const findPrice = async () => {
-		const category = categoryList.value.find((x) => x.id == categoryId.value);
+	console.log(categoryId.value);
+	const findPrice = () => {
+		console.log(categoryId.value);
+		const category = categoryList.value.find((x) => x.id == categoryId?.value);
 		updateEventState('price', category.price);
-		updateEventState('eventCategoryName', category.name);
-		updateEventState('eventCategoryId', categoryId.value);
-	};
 
-	const handeSeatPlan = () => {
-		if (categoryId.value) {
-			$toast.success('Event category selected successfully');
+		localStorage.setItem('price', category.price);
+		updateEventState('eventCategoryName', category.name);
+		localStorage.setItem('eventCategoryName', category.name);
+		updateEventState('eventCategoryId', categoryId.value);
+		localStorage.setItem('eventCategoryId', categoryId.value);
+		updateEventState('step', 2);
+		localStorage.setItem('step', 2);
+	};
+	console.log(categoryId.value);
+	const goToPayment = () => {
+		s;
+		if (categoryId.value !== undefined || null) {
+			$toast.success('Event category selected successfully', {
+				position: 'top-right',
+			});
 			router.push('/event-detail/event-seat-plan');
 		} else {
-			console.log('select a  category');
-			$toast.error('please  select a seat');
+			$toast.error('please  select a category', { position: 'top-right' });
 		}
 	};
 	onMounted(() => {
 		spinnerOpen.value = true;
-		Service.getEventDetailPage(store.state.eventId)
+		Service.getEventDetailPage(
+			localStorage.getItem('eventId') ?? store.state.eventId
+		)
 			.then((res) => {
 				eventDetails.value = res?.data?.data;
 
 				categoryList.value = res?.data?.data?.event_categories;
+				eventVenue.value = res?.data?.data?.venue;
+
 				setTimeout(() => {
 					spinnerOpen.value = false;
 				}, 1000);
 			})
-			.catch((error) => $toast.error(error.message));
+			.catch((error) => $toast.error(error.message, { position: 'top-right' }));
 	});
 </script>
 
@@ -79,11 +96,11 @@
 			<div class="mb-6" v-if="!eventDetails?.image_url">
 				<img class="object-fill w-84" src="default_picture.png" alt="" />
 			</div>
-			<!-- <div class="pt-4 pb-2">
+			<div class="pt-4 pb-2">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-map-location" />
-				<span class="font-bold">{{ eventDetails.venue['name'] }}</span>
-				<span class="ml-6 block">{{ eventDetails.venue['address'] }}</span>
-			</div> -->
+				<span class="font-bold">{{ eventVenue?.name }}</span>
+				<span class="ml-6 block">{{ eventVenue?.address }}</span>
+			</div>
 			<p class="">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-calendar-days" />
 				<span>
@@ -96,27 +113,42 @@
 			</p>
 
 			<div class="flex flex-col my-4 desktop:w-[500px] mobile:w-full">
-				<label class="my-2" for="category">Select a category</label>
+				<!-- <label class="my-2" for="category">Select a category</label>
 
 				<select
 					name="category"
 					id=""
+					class="select-custom"
 					v-model="categoryId"
 					placeholder="Please choose an option"
 					@change="findPrice"
 				>
 					<option
+						class="option-custom"
 						v-for="item in eventDetails?.event_categories"
 						:value="item.id"
 					>
 						{{ item.name }} - {{ item.price }} TL
 					</option>
-				</select>
+				</select> -->
+
+				<v-select
+					v-model="categoryId"
+					placeholder="Please Select a Category"
+					:reduce="(x) => x.id"
+					@click="findPrice()"
+					:options="eventDetails?.event_categories"
+					label="id"
+				>
+					<template v-slot:option="option"
+						>{{ option.name }} {{ option.price }} TL</template
+					>
+				</v-select>
 			</div>
 
 			<div>
 				<button
-					@click="handeSeatPlan"
+					@click="goToPayment"
 					class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
 				>
 					Go to seat plan

@@ -1,11 +1,18 @@
 <script setup>
 	import { useRoute, useRouter } from 'vue-router';
 
+	const goToHomePage = () => {
+		localStorage.clear();
+		localStorage.setItem('step', 0);
+
+		router.push(`/`);
+	};
+
 	const router = useRouter();
 </script>
 
 <template>
-	<div class="bg-gray-100 h-screen">
+	<div class="bg-indigo-100 h-screen">
 		<div class="bg-indigo-100 p-6 md:mx-auto">
 			<svg viewBox="0 0 24 24" class="text-green-600 w-16 h-16 mx-auto my-6">
 				<path
@@ -25,7 +32,7 @@
 				<p>Have a great day!</p>
 				<div class="py-10 text-center">
 					<button
-						@click="router.push(`/`)"
+						@click="goToHomePage"
 						class="px-12 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold py-2"
 					>
 						BUY A NEW TICKET

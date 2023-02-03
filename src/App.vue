@@ -1,50 +1,17 @@
 <script setup>
-	import { RouterLink, RouterView } from 'vue-router';
+	import { RouterView } from 'vue-router';
 	import FooterComp from './components/FooterComp.vue';
 	import HeaderComp from './components/HeaderComp.vue';
 </script>
 
 <template>
-	<nav class="flex-wrap bg-indigo-500 p-6">
+	<div class="flex flex-col min-h-[100vh]">
 		<HeaderComp></HeaderComp>
-	</nav>
-	<RouterView />
 
-	<FooterComp></FooterComp>
+		<RouterView class="overflow-auto" />
+
+		<FooterComp class="app-footer"></FooterComp>
+	</div>
 </template>
 
-<style>
-	.slide-enter-active,
-	.slide-leave-active {
-		transition: opacity 1s, transform 1s;
-	}
-
-	.slide-enter,
-	.slide-leave-to {
-		opacity: 0;
-		transform: translateX(-30%);
-	}
-	.slide- .logo {
-		display: block;
-		margin: 0 auto 2rem;
-	}
-
-	nav {
-		width: 100%;
-		font-size: 12px;
-		text-align: center;
-	}
-
-	@media (min-width: 1024px) {
-		header {
-			display: flex;
-			place-items: center;
-			padding-right: calc(var(--section-gap) / 2);
-		}
-
-		nav {
-			text-align: left;
-			font-size: 1rem;
-		}
-	}
-</style>
+<style></style>

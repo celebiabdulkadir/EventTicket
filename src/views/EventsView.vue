@@ -22,6 +22,11 @@
 	const handleClick = (id) => {
 		updateEventState('eventId', id);
 
+		localStorage.setItem('eventId', id);
+		updateEventState('step', 1);
+
+		localStorage.setItem('step', 1);
+
 		if (id !== undefined || id !== null || id !== '') {
 			router.push('/event-detail');
 		}
@@ -37,7 +42,7 @@
 					spinnerOpen.value = false;
 				}, 2000);
 			})
-			.catch((error) => $toast.error(error.message));
+			.catch((error) => $toast.error(error.message, { position: 'top-right' }));
 	});
 </script>
 
@@ -65,7 +70,11 @@
 			</div>
 
 			<div class="mb-6" v-if="!item?.image_url">
-				<img class="object-fill w-84" src="default_picture.png" alt="" />
+				<img
+					class="desktop:w-72 m-2 mobile:w-full"
+					src="default_picture.png"
+					alt=""
+				/>
 			</div>
 
 			<div class="px-6 pt-4 pb-2 text-2xl font-bold">

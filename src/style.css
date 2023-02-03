@@ -14,13 +14,12 @@ button:disabled:hover {
 	opacity: 60;
 }
 #app {
-	position: relative;
-	min-height: 100vh;
+	@apply bg-indigo-100  min-h-[100vh] flex flex-col w-full;
 }
-body {
-	@apply bg-indigo-100;
-}
-#footer {
+
+.app-footer {
+	/* bottom: 0;
+	height: 70px;
 	position: fixed;
-	bottom: 0;
+	width: 100%; */
 }

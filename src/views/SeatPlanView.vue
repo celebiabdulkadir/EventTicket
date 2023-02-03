@@ -21,19 +21,28 @@
 		store.commit('update', [key, value]);
 	};
 
+	const categoryName =
+		localStorage.getItem('eventCategoryName') ?? store.state.eventCategoryName;
+
+	const categoryPrice = localStorage.getItem('price') ?? store.state.price;
+
 	const occupiedSeats = computed(() => {
 		const seats = newSeatPlan.value.map((element) => element.seats);
 
 		const newArray = seats.flat().filter((seat) => seat.Active);
 
 		updateEventState('seats', newArray);
+		localStorage.setItem('seats', JSON.stringify(occupiedSeats.value));
 
 		return newArray;
 	});
 
 	const calculateTotal = computed(() => {
-		const total = store.state.seats.length * store.state.price;
+		const total =
+			store.state.seats.length *
+			(localStorage.getItem('price') ?? store.state.price);
 		updateEventState('totalPrice', total);
+		localStorage.setItem('totalPrice', total);
 		return total;
 	});
 
@@ -59,7 +68,6 @@
 			}
 		}
 		newSeatPlan.value = newArray;
-		console.log(newSeatPlan.value);
 		return newArray;
 	};
 
@@ -70,19 +78,21 @@
 			setTimeout(() => {
 				spinnerOpen.value = false;
 				router.push(`/payment`);
+				updateEventState('step', 3);
+				localStorage.setItem('step', 3);
 
-				$toast.success('Seat selection completed!');
+				$toast.success('Seat selection completed!', { position: 'top-right' });
 			}, 3000);
 		} else {
-			$toast.error('Please select seat');
+			$toast.error('Please select seat', { position: 'top-right' });
 		}
 	};
 
 	onMounted(() => {
 		spinnerOpen.value = true;
 		Service.getSeatPlan(
-			store?.state?.eventId,
-			store.state.eventCategoryId
+			localStorage.getItem('eventId') ?? store?.state?.eventId,
+			localStorage.getItem('eventCategoryId') ?? store.state.eventCategoryId
 		).then((res) => {
 			for (const element of res.data.data) {
 				element.Active = false;
@@ -99,7 +109,7 @@
 
 <template>
 	<div
-		class="bg-indigo-100 min-h-[60vh] desktop:px-16 relative w-full flex desktop:flex-row mobile:flex-col align-middle items-center mobile:justify-center desktop:justify-center space-x-28"
+		class="bg-indigo-100 min-h-[60vh] desktop:px-16 relative w-full flex desktop:flex-row mobile:flex-col align-middle items-center justify-center desktop:space-x-28"
 	>
 		<div
 			v-if="spinnerOpen"
@@ -108,9 +118,9 @@
 			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
 		</div>
 		<div
-			class="flex flex-row min-h-[30vh] align-middle overflow-x-auto overscroll-auto items-center bg-white rounded-md shadow-3xl"
+			class="flex flex-row min-h-[30vh] w-full overflow-auto align-middle items-center bg-white rounded-md shadow-3xl"
 		>
-			<div class="justify-center flex flex-col w-full overscroll-auto">
+			<div class="justify-center flex flex-col w-full">
 				<h1 class="text-center my-2 font-bold text-xl">Seat Selection</h1>
 				<div
 					v-for="item in newSeatPlan"
@@ -197,15 +207,13 @@
 				<div>
 					<p class="flex mx-4 flex-row justify-between font-bold">
 						<span class="inline-block font-normal">Ticket Category : </span>
-						<span class="inline-block">
-							{{ store.state.eventCategoryName }}</span
-						>
+						<span class="inline-block"> {{ categoryName }}</span>
 					</p>
 				</div>
 				<div class="mx-4">
 					<p class="flex flex-row justify-between mb-12 font-bold">
 						<span class="inline-block font-normal">Ticket Price : </span>
-						<span class="inline-block"> {{ store.state.price }} TL</span>
+						<span class="inline-block"> {{ categoryPrice }} TL</span>
 					</p>
 				</div>
 				<div class="flex flex-col justify-center align-middle mx-4 min-w-[20%]">

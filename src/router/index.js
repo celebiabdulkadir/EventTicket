@@ -6,6 +6,10 @@ import EventDetailView from '../views/EventDetailView.vue';
 import store from '../store';
 
 const router = createRouter({
+	scrollBehavior(to, from, savedPosition) {
+		// always scroll to top
+		return { top: 0 };
+	},
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
 		{
@@ -42,20 +46,29 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-	if (to.path === '/payment' && store.state.seats.length < 1) {
+	if (
+		to.path === '/payment' &&
+		(localStorage.getItem('step') ?? store.state.step) < 3
+	) {
 		return router.push('/');
 	}
 
-	if (to.path === '/paymentsuccess' && store.state.cc_number.length < 1) {
+	if (
+		to.path === '/paymentsuccess' &&
+		(localStorage.getItem('step') ?? store.state.step) < 4
+	) {
 		return router.push('/');
 	}
-	if (to.name === 'event-detail' && store.state.eventId == '') {
+	if (
+		to.name === 'event-detail' &&
+		(localStorage.getItem('step') ?? store.state.step) < 1
+	) {
 		return router.push('/');
 	}
 
 	if (
 		to.path === '/event-detail/event-seat-plan' &&
-		store.state.eventCategoryId == ''
+		(localStorage.getItem('step') ?? store.state.step) < 2
 	) {
 		return router.push('/');
 	}
