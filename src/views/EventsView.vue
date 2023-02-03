@@ -72,7 +72,7 @@
 			<div class="mb-6" v-if="!item?.image_url">
 				<img
 					class="desktop:w-72 m-2 mobile:w-full"
-					src="default_picture.png"
+					src="/default_picture.png"
 					alt=""
 				/>
 			</div>

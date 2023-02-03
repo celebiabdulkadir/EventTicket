@@ -11,7 +11,7 @@
 	<div class="text-center bg-indigo-500 text-white">
 		<div class="pt-6 pb-4">
 			<div class="flex flex-row justify-between mb-4 mx-8">
-				<div>
+				<div class="flex flex-row">
 					<a
 						href="https://twitter.com/abdulkadirclb"
 						target="_blank"

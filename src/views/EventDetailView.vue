@@ -4,9 +4,9 @@
 	import { useStore } from 'vuex';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useToast } from 'vue-toast-notification';
+
 	import Spinner from '../components/Spinner.vue';
 	import 'vue-toast-notification/dist/theme-sugar.css';
-	import 'vue-select/dist/vue-select.css';
 
 	import moment from 'moment';
 
@@ -17,7 +17,7 @@
 	const eventVenue = ref();
 	const spinnerOpen = ref(false);
 
-	const categoryId = ref([]);
+	const categoryId = ref('');
 
 	const categoryList = ref([]);
 
@@ -28,24 +28,25 @@
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
-	console.log(categoryId.value);
-	const findPrice = () => {
-		console.log(categoryId.value);
-		const category = categoryList.value.find((x) => x.id == categoryId?.value);
-		updateEventState('price', category.price);
 
-		localStorage.setItem('price', category.price);
-		updateEventState('eventCategoryName', category.name);
-		localStorage.setItem('eventCategoryName', category.name);
-		updateEventState('eventCategoryId', categoryId.value);
-		localStorage.setItem('eventCategoryId', categoryId.value);
-		updateEventState('step', 2);
-		localStorage.setItem('step', 2);
-	};
-	console.log(categoryId.value);
+	const findPrice = async () => {};
 	const goToPayment = () => {
-		s;
-		if (categoryId.value !== undefined || null) {
+		if (
+			categoryId.value !== undefined ||
+			categoryId.value !== null ||
+			categoryId.value !== ''
+		) {
+			const category = categoryList.value.find(
+				(x) => x.id == categoryId?.value
+			);
+			updateEventState('price', category.price);
+			localStorage.setItem('price', category.price);
+			updateEventState('eventCategoryName', category.name);
+			localStorage.setItem('eventCategoryName', category.name);
+			updateEventState('eventCategoryId', categoryId.value);
+			localStorage.setItem('eventCategoryId', categoryId.value);
+			updateEventState('step', 2);
+			localStorage.setItem('step', 2);
 			$toast.success('Event category selected successfully', {
 				position: 'top-right',
 			});
@@ -113,36 +114,17 @@
 			</p>
 
 			<div class="flex flex-col my-4 desktop:w-[500px] mobile:w-full">
-				<!-- <label class="my-2" for="category">Select a category</label>
-
-				<select
-					name="category"
-					id=""
-					class="select-custom"
-					v-model="categoryId"
-					placeholder="Please choose an option"
-					@change="findPrice"
-				>
-					<option
-						class="option-custom"
-						v-for="item in eventDetails?.event_categories"
-						:value="item.id"
-					>
-						{{ item.name }} - {{ item.price }} TL
-					</option>
-				</select> -->
+				<label class="mt-2 mb-4" for="category">Select a category :</label>
 
 				<v-select
 					v-model="categoryId"
 					placeholder="Please Select a Category"
 					:reduce="(x) => x.id"
-					@click="findPrice()"
 					:options="eventDetails?.event_categories"
-					label="id"
+					:get-option-label="
+						(option) => option.name + ' ' + option.price + 'TL'
+					"
 				>
-					<template v-slot:option="option"
-						>{{ option.name }} {{ option.price }} TL</template
-					>
 				</v-select>
 			</div>
 
@@ -158,4 +140,6 @@
 	</div>
 </template>
 
-<style></style>
+<style>
+	@import 'vue-select/dist/vue-select.css';
+</style>
