@@ -8,9 +8,9 @@
 </script>
 
 <template>
-	<div class="text-center bg-indigo-500 text-white">
+	<div class="text-center bg-indigo-500 text-white absolute bottom-0 w-full">
 		<div class="pt-6 pb-4">
-			<div class="flex flex-row justify-between mb-4 mx-8">
+			<div class="flex flex-row justify-between mb-4 desktop:mx-10 mobile:mx-2">
 				<div class="flex flex-row">
 					<a
 						href="https://twitter.com/abdulkadirclb"

@@ -29,13 +29,21 @@
 		store.commit('update', [key, value]);
 	};
 
-	const findPrice = async () => {};
+	const goBack = () => {
+		router.go(-1);
+		store.commit('clear');
+		localStorage.clear();
+	};
+
 	const goToPayment = () => {
 		if (
-			categoryId.value !== undefined ||
-			categoryId.value !== null ||
-			categoryId.value !== ''
+			categoryId.value === 'undefined' ||
+			categoryId.value === 'null' ||
+			categoryId.value === ''
 		) {
+			$toast.error('please  select a category', { position: 'top-right' });
+			return;
+		} else {
 			const category = categoryList.value.find(
 				(x) => x.id == categoryId?.value
 			);
@@ -51,8 +59,6 @@
 				position: 'top-right',
 			});
 			router.push('/event-detail/event-seat-plan');
-		} else {
-			$toast.error('please  select a category', { position: 'top-right' });
 		}
 	};
 	onMounted(() => {
@@ -76,17 +82,26 @@
 
 <template>
 	<div
-		class="flex relative flex-col justify-center align-middle items-center bg-indigo-100"
+		class="flex relative flex-col justify-center mobile:mx-2 align-middle items-center bg-indigo-100"
 	>
 		<div
 			v-if="spinnerOpen"
-			class="absolute bg-indigo-100 opacity-70 w-full h-full"
+			class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
 		>
 			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
 		</div>
 		<div
-			class="desktop:mx-2 desktop:my-2 desktop:max-w-[500px] mobile:w-full h-full mobile:p-2 mobile:h-full"
+			class="desktop:mx-2 desktop:my-2 desktop:max-w-[500px] mobile:w-full h-full"
 		>
+			<div class="">
+				<button
+					class="inline-block hover:scale-105 font-bold py-2 rounded"
+					@click="goBack"
+				>
+					<font-awesome-icon style="" icon="fa-solid fa-circle-arrow-left" />
+					Back
+				</button>
+			</div>
 			<div>
 				<h1 class="mt-2 mb-6 font-bold text-xl">{{ eventDetails?.title }}</h1>
 			</div>
@@ -95,7 +110,7 @@
 			<div><img :src="eventDetails?.image_url" alt="" class="" /></div>
 
 			<div class="mb-6" v-if="!eventDetails?.image_url">
-				<img class="object-fill w-84" src="default_picture.png" alt="" />
+				<img class="object-fill w-84" src="/default_picture.png" alt="" />
 			</div>
 			<div class="pt-4 pb-2">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-map-location" />
@@ -110,7 +125,7 @@
 			</p>
 			<p class="mr-4 inline-block pt-6">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-stopwatch" />
-				<span> {{ moment(eventDetails.event_date).format('hh-mm') }} </span>
+				<span> {{ moment(eventDetails.event_date).format('hh:mm') }} </span>
 			</p>
 
 			<div class="flex flex-col my-4 desktop:w-[500px] mobile:w-full">
@@ -122,18 +137,27 @@
 					:reduce="(x) => x.id"
 					:options="eventDetails?.event_categories"
 					:get-option-label="
-						(option) => option.name + ' ' + option.price + 'TL'
+						(option) => option.name + '  ' + '₺' + option.price
 					"
 				>
 				</v-select>
+				<p class="text-red-300 opacity-60" v-if="categoryId.length < 1">
+					*Please select a category
+				</p>
 			</div>
 
-			<div>
+			<div class="flex flex-row justify-between my-2">
+				<button
+					class="bg-red-300 inline-block hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+					@click="goBack"
+				>
+					<font-awesome-icon icon="fa-solid fa-circle-arrow-left" /> Back
+				</button>
 				<button
 					@click="goToPayment"
-					class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+					class="bg-indigo-500 inline-block hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
 				>
-					Go to seat plan
+					Go to seat plan <font-awesome-icon icon="fa-solid fa-circle-right" />
 				</button>
 			</div>
 		</div>

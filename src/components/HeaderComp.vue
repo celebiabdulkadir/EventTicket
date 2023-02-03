@@ -21,7 +21,7 @@
 	<header>
 		<div class="flex items-center flex-shrink-0 text-white bg-indigo-500 p-4">
 			<svg
-				@click="router.push(`/`)"
+				@click="goHomeButton"
 				class="fill-current h-8 w-8 mr-2 cursor-pointer"
 				width="54"
 				height="54"

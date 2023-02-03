@@ -8,6 +8,8 @@
 		router.push(`/`);
 	};
 
+	const summary = () => {};
+
 	const router = useRouter();
 </script>
 

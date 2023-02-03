@@ -14,7 +14,7 @@ button:disabled:hover {
 	opacity: 60;
 }
 #app {
-	@apply bg-indigo-100  min-h-[100vh] flex flex-col w-full;
+	@apply bg-indigo-100 relative min-h-[100vh] flex flex-col w-full;
 }
 
 .app-footer {
