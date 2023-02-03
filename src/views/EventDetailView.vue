@@ -95,7 +95,7 @@
 			<div><img :src="eventDetails?.image_url" alt="" class="" /></div>
 
 			<div class="mb-6" v-if="!eventDetails?.image_url">
-				<img class="object-fill w-84" src="default_picture.png" alt="" />
+				<img class="object-fill w-84" src="/default_picture.png" alt="" />
 			</div>
 			<div class="pt-4 pb-2">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-map-location" />
