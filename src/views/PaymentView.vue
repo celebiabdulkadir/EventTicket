@@ -6,9 +6,15 @@
 	import { useToast } from 'vue-toast-notification';
 	import Spinner from '../components/Spinner.vue';
 	import 'vue-toast-notification/dist/theme-sugar.css';
+
+	import moment from 'moment';
 	const $toast = useToast();
 	const spinnerOpen = ref(false);
 	const cardNumber = ref('');
+
+	const calculateTotalPrice = computed(() => {
+		return localStorage.getItem('totalPrice') ?? store.state.totalPrice;
+	});
 	const emailValue = ref('');
 	const cvvNum = ref('');
 	const creditCardExpMonth = ref('');
@@ -18,8 +24,19 @@
 
 	const store = useStore();
 
+	const goBack = () => {
+		router.go(-1);
+		localStorage.setItem('step', 2);
+
+		localStorage.removeItem('totalPrice');
+		localStorage.removeItem('seats');
+
+		store.commit('update', ['step', 2]);
+		store.commit('update', ['totalPrice', '']);
+		store.commit('update', ['seats', '[]']);
+	};
 	const emailValid = computed(() => {
-		return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+		return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,6})+$/.test(
 			emailValue.value
 		);
 	});
@@ -34,12 +51,35 @@
 		);
 	});
 
+	const monthYear = computed(() => {
+		const result = `01/${creditCardExpMonth.value}/${creditCardExpYear.value}`;
+		console.log('result: ', result);
+		return moment(result).format('DD/MM/YYYY');
+	});
+
+	console.log(creditCardExpMonth.value);
+	console.log(creditCardExpYear.value);
+	const dateValid = computed(() => {
+		const currentDate = moment(new Date()).format('DD/MM/YYYY');
+
+		const expDate = moment(monthYear.value);
+
+		const difference = expDate.diff(currentDate, 'months');
+
+		if (difference >= -2) {
+			return true;
+		}
+
+		console.log('difference', difference);
+	});
+
 	const securityCodeValid = computed(() => {
 		return /^[0-9]{3,4}$/.test(cvvNum.value);
 	});
 
 	const isFormValid = computed(() => {
 		if (
+			dateValid.value &&
 			creditCardValid.value &&
 			emailValid.value &&
 			creditCardExpMonth.value !== '' &&
@@ -54,6 +94,8 @@
 
 	const updateCardValue = (e) => {
 		cardNumber.value = e.target.value.replace(/ /g, '');
+		console.log(creditCardExpMonth.value);
+		console.log(creditCardExpYear.value);
 		updateEventState('cc_number', cardNumber.value);
 	};
 	const formatCardNumber = computed(() => {
@@ -85,18 +127,16 @@
 			.then((res) => {
 				setTimeout(() => {
 					updateEventState('step', 4);
-					localStorage.clear();
 					router.push('/paymentsuccess');
 
-					store.commit('clear');
 					localStorage.setItem('step', 4);
 
 					$toast.success('Payment successfully completed!', {
 						position: 'top-right',
 					});
-				}, 2000);
 
-				spinnerOpen.value = false;
+					spinnerOpen.value = false;
+				}, 2000);
 			})
 			.catch((error) => {
 				$toast.error(error.message, { position: 'top-right' });
@@ -112,24 +152,35 @@
 	>
 		<div
 			v-if="spinnerOpen"
-			class="absolute bg-indigo-100 opacity-70 w-full h-full"
+			class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
 		>
 			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
 		</div>
+
 		<div
 			class="w-full mx-auto rounded-lg bg-white shadow-lg p-5 text-gray-700"
 			style="max-width: 600px"
 		>
 			<div class="w-full pt-1 pb-5">
 				<div
-					class="bg-indigo-500 text-white overflow-hidden rounded-full w-24 h-24 -mt-16 mx-auto shadow-lg flex justify-center items-center"
+					class="bg-indigo-500 text-white overflow-hidden rounded-full w-16 h-16 -mt-14 mx-auto shadow-lg flex justify-center items-center"
 				>
-					<font-awesome-icon class="fa-3x" icon="fa-solid fa-money-check" />
+					<font-awesome-icon class="fa-2x" icon="fa-solid fa-money-check" />
+				</div>
+				<div class="flex flex-start justify-start">
+					<button
+						class="inline-block hover:scale-105 font-bold py-2 rounded"
+						@click="goBack"
+					>
+						<font-awesome-icon style="" icon="fa-solid fa-circle-arrow-left" />
+						Back
+					</button>
 				</div>
 			</div>
-			<div class="mb-10">
+			<div class="mb-4">
 				<h1 class="text-center font-bold text-xl uppercase">Payment info</h1>
 			</div>
+
 			<div class="mb-3">
 				<label class="font-bold text-sm mb-2 ml-1">Your name</label>
 				<div>
@@ -183,6 +234,7 @@
 						class="w-full px-3 py-2 mb-1 border-2 border-gray-200 rounded-md focus:outline-none focus:border-indigo-500 transition-colors"
 						placeholder="0000 0000 0000 0000"
 						:value="formatCardNumber"
+						maxlength="19"
 						required
 						@input="updateCardValue"
 					/>
@@ -219,6 +271,7 @@
 						</select>
 					</div>
 				</div>
+
 				<div class="px-2 w-1/2">
 					<select
 						required
@@ -226,20 +279,26 @@
 						@input="updateEventState('cc_exp_year', $event.target.value)"
 						class="form-select w-full px-3 py-2 mb-1 border-2 border-gray-200 rounded-md focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
 					>
-						<option value="2020">2023</option>
-						<option value="2021">2024</option>
-						<option value="2022">2025</option>
-						<option value="2023">2026</option>
-						<option value="2024">2027</option>
-						<option value="2025">2028</option>
-						<option value="2026">2029</option>
-						<option value="2027">2030</option>
-						<option value="2028">2031</option>
-						<option value="2029">2032</option>
+						<option value="2023">2023</option>
+						<option value="2024">2024</option>
+						<option value="2025">2025</option>
+						<option value="2026">2026</option>
+						<option value="2027">2027</option>
+						<option value="2028">2028</option>
+						<option value="2029">2029</option>
+						<option value="2030">2030</option>
+						<option value="2031">2031</option>
+						<option value="2032">2032</option>
 					</select>
 				</div>
 			</div>
-			<div class="mb-10">
+			<p
+				class="text-red-400/100 px-3"
+				v-if="!dateValid && creditCardExpYear.length > 0"
+			>
+				Please enter valid date
+			</p>
+			<div class="mb-6">
 				<label class="font-bold text-sm mb-2 ml-1">Security code</label>
 
 				<div>
@@ -260,6 +319,14 @@
 				</div>
 			</div>
 			<div>
+				<div class="flex mb-2 flex-col justify-center">
+					<h1 class="mr-2 text-xs font-bold">TOTAL PRICE</h1>
+					<h1>
+						<strong class="text-2xl font-bold"
+							>₺{{ calculateTotalPrice }}
+						</strong>
+					</h1>
+				</div>
 				<button
 					type="submit"
 					@click="submitHandler"
@@ -270,7 +337,19 @@
 
 				<p class="text-left pt-4 text-xs opacity-50">
 					By making a payment, you are deemed to have accepted
-					<strong>Terms of Use</strong> and <strong>Privacy Policy</strong>
+					<strong class="cursor-pointer"
+						><a
+							href="https://www.derslig.com/kullanim-kosullari"
+							target="_blank"
+							>Terms of Use</a
+						>
+					</strong>
+					and
+					<strong class="cursor-pointer" target="_blank"
+						><a href="https://www.derslig.com/gizlilik-sozlesmesi"
+							>Privacy Policy</a
+						>
+					</strong>
 				</p>
 			</div>
 		</div>

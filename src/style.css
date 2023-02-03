@@ -13,13 +13,10 @@ button[disabled] {
 button:disabled:hover {
 	opacity: 60;
 }
-#app {
-	@apply bg-indigo-100  min-h-[100vh] flex flex-col w-full;
+body {
+	font-family: 'Poppins', sans-serif;
 }
 
-.app-footer {
-	/* bottom: 0;
-	height: 70px;
-	position: fixed;
-	width: 100%; */
+#app {
+	@apply bg-indigo-100 relative min-h-[100vh] flex flex-col w-full;
 }

@@ -21,6 +21,23 @@
 		store.commit('update', [key, value]);
 	};
 
+	const goBack = () => {
+		router.go(-1);
+		store.commit('update', ['eventCategoryId', '']);
+		store.commit('update', ['eventCategoryName', '']);
+
+		store.commit('update', ['price', '']);
+		store.commit('update', ['seats', []]);
+
+		store.commit('update', ['step', 1]);
+		localStorage.setItem('step', 1);
+		localStorage.removeItem('price');
+		localStorage.removeItem('eventCategoryName');
+		localStorage.removeItem('seats');
+
+		localStorage.removeItem('eventCategoryId');
+	};
+
 	const categoryName =
 		localStorage.getItem('eventCategoryName') ?? store.state.eventCategoryName;
 
@@ -110,23 +127,33 @@
 
 <template>
 	<div
+		v-if="spinnerOpen"
+		class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
+	>
+		<Spinner class="absolute right-1/2 top-1/2"></Spinner>
+	</div>
+	<div
 		class="bg-indigo-100 min-h-[60vh] desktop:px-16 relative w-full flex desktop:flex-row mobile:flex-col align-middle items-center justify-center desktop:space-x-28"
 	>
-		<div
-			v-if="spinnerOpen"
-			class="absolute bg-indigo-200 opacity-80 w-full h-full"
-		>
-			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
+		<div class="flex flex-start justify-end">
+			<button
+				class="inline-block hover:scale-105 font-bold py-2 rounded"
+				@click="goBack"
+			>
+				<font-awesome-icon style="" icon="fa-solid fa-circle-arrow-left" />
+				Back
+			</button>
 		</div>
+
 		<div
-			class="flex flex-row min-h-[30vh] w-full overflow-auto align-middle items-center bg-white rounded-md shadow-3xl"
+			class="flex flex-row min-h-[30vh] w-full overflow-auto align-middle items-center bg-white rounded-md my-8"
 		>
 			<div class="justify-center flex flex-col w-full">
 				<h1 class="text-center my-2 font-bold text-xl">Seat Selection</h1>
 				<div
 					v-for="item in newSeatPlan"
 					v-if="newSeatPlan.length > 0"
-					class="flex flex-row flex-start a m-2 p-2"
+					class="flex flex-row flex-start m-2 p-2"
 					:key="item.rows"
 				>
 					<div class="flex flex-row">
@@ -162,7 +189,7 @@
 		</div>
 		<div
 			:class="[occupiedSeats.length > 0 ? 'min-h-[45vh]' : 'min-h-[32vh]']"
-			class="flex flex-col align-middle justify-start min-h-[45vh] desktop:w-96 mobile:w-full bg-white rounded-md my-8 shadow-3xl"
+			class="flex flex-col align-middle justify-start min-h-[45vh] desktop:w-96 mobile:w-full bg-white rounded-md my-8"
 		>
 			<div class="flex flex-col justify-start mx-4">
 				<h1 class="my-2 font-bold text-xl mx-4">
@@ -214,13 +241,13 @@
 				<div class="mx-4">
 					<p class="flex flex-row justify-between mb-12 font-bold">
 						<span class="inline-block font-normal">Ticket Price : </span>
-						<span class="inline-block"> {{ categoryPrice }} TL</span>
+						<span class="inline-block"> ₺{{ categoryPrice }}</span>
 					</p>
 				</div>
 				<div class="flex flex-col justify-center align-middle mx-4 min-w-[20%]">
 					<p class="underlined flex flex-row justify-between font-bold text-lg">
 						<span class="inline-block">Total Price:</span>
-						<span class="inline-block">{{ calculateTotal }} TL</span>
+						<span class="inline-block">₺{{ calculateTotal }} </span>
 					</p>
 				</div>
 
@@ -229,7 +256,7 @@
 						@click="goToPayment"
 						class="bg-indigo-500 w-full hover:bg-indigo-700 text-white font-bold p-4 m-4 rounded"
 					>
-						Go to Payment
+						Go to Payment <font-awesome-icon icon="fa-solid fa-circle-right" />
 					</button>
 				</div>
 			</div>

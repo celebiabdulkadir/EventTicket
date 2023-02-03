@@ -48,22 +48,28 @@
 
 <template>
 	<div
-		class="flex relative flex-row desktop:p-6 desktop:m-4 mobile:p-0 mobile:m-0 flex-wrap"
+		v-if="spinnerOpen"
+		class="absolute w-full h-full bg-gray-50 opacity-90 z-20"
+	>
+		<Spinner class="absolute left-1/2 top-1/2"></Spinner>
+	</div>
+	<div class="pt-8 desktop:pl-10 mobile:px-2">
+		<h1 class="text-lg font-bold">ALL EVENTS</h1>
+		<p class="opacity-60">
+			Discover and buy tickets for your exclusive events.
+		</p>
+	</div>
+
+	<div
+		class="flex relative flex-row desktop:p-6 desktop:m-4 mobile:px-2 mobile:pt-6 mobile:m-0 flex-wrap"
 	>
 		<div
-			v-if="spinnerOpen"
-			class="absolute w-full h-full bg-gray-50 opacity-70"
-		>
-			<Spinner class="absolute left-1/2 top-1/2"></Spinner>
-		</div>
-
-		<div
-			class="rounded overflow-hidden shadow-lg desktop:mb-8 mobile:mb-2 desktop:mr-8 mobile:mr-2 mobile:w-full desktop:w-72 bg-indigo-100"
+			class="rounded overflow-hidden shadow-lg desktop:mb-8 mobile:mb-2 desktop:mr-8 mobile:w-full desktop:w-72 bg-white"
 			v-for="item in events"
 		>
 			<div>
 				<img
-					class="object-cover desktop:w-72 m-2 mobile:w-full"
+					class="object-cover desktop:w-72 mobile:w-full"
 					:src="item.image_url"
 					alt="event-photo"
 				/>
@@ -71,7 +77,7 @@
 
 			<div class="mb-6" v-if="!item?.image_url">
 				<img
-					class="desktop:w-72 m-2 mobile:w-full"
+					class="desktop:w-72 m-2 mobile:w-full object-cover"
 					src="/default_picture.png"
 					alt=""
 				/>
@@ -82,7 +88,7 @@
 					{{ item.title }}
 				</h1>
 			</div>
-			<div class="px-6 pt-4 pb-2">
+			<div class="px-6 pt-4 pb-2 min-h-[9.5vh]">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-map-location" />
 				<span>{{ item.venue.name }}</span>
 			</div>
@@ -93,7 +99,7 @@
 				</p>
 				<p class="mr-4 inline-block pt-6">
 					<font-awesome-icon class="mr-2" icon="fa-solid fa-stopwatch" />
-					<span> {{ moment(item.event_date).format('hh-mm') }} </span>
+					<span> {{ moment(item.event_date).format('hh:mm') }} </span>
 				</p>
 
 				<button
