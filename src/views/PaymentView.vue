@@ -29,7 +29,9 @@
 	};
 
 	const creditCardValid = computed(() => {
-		return /[0-9]{16}(?:[0-9]{3})?\b/.test(cardNumber.value);
+		return /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}(?:2131|1800|35\d{3})\d{11})$/.test(
+			cardNumber.value
+		);
 	});
 
 	const securityCodeValid = computed(() => {
@@ -47,9 +49,7 @@
 			securityCodeValid.value
 		) {
 			return true;
-		} else {
-			return false;
-		}
+		} else false;
 	});
 
 	const updateCardValue = (e) => {
@@ -63,39 +63,52 @@
 	const submitHandler = (e) => {
 		e.preventDefault();
 
-		if (isFormValid) {
-			spinnerOpen.value = true;
-			Service.completePayment({
-				eventId: store.state.eventId,
-				eventCategoryId: store.state.eventCategoryId,
-				seats: store.state.seats,
-				customer_name: store.state.customer_name,
-				customer_surname: store.state.customer_surname,
-				customer_email: store.state.customer_email,
-				cc_number: store.state.cc_number,
-				cc_exp_month: store.state.cc_exp_month,
-				cc_exp_year: store.state.cc_exp_year,
-				cc_exp_cvv: store.state.cc_exp_cvv,
-			})
-				.then((res) => {
+		if (!isFormValid.value) {
+			return $toast.error('Please check your information', {
+				position: 'top-right',
+			});
+		}
+
+		spinnerOpen.value = true;
+		Service.completePayment({
+			eventId: store.state.eventId,
+			eventCategoryId: store.state.eventCategoryId,
+			seats: store.state.seats,
+			customer_name: store.state.customer_name.trim(),
+			customer_surname: store.state.customer_surname.trim(),
+			customer_email: store.state.customer_email.trim(),
+			cc_number: store.state.cc_number.trim(),
+			cc_exp_month: store.state.cc_exp_month,
+			cc_exp_year: store.state.cc_exp_year,
+			cc_exp_cvv: store.state.cc_exp_cvv.trim(),
+		})
+			.then((res) => {
+				setTimeout(() => {
+					updateEventState('step', 4);
+					localStorage.clear();
 					router.push('/paymentsuccess');
 
-					$toast.success('Payment successfully completed!');
+					store.commit('clear');
+					localStorage.setItem('step', 4);
 
-					spinnerOpen.value = false;
-				})
-				.catch((error) => {
-					$toast.error(error.message);
-					console.log(error);
-				});
-		}
+					$toast.success('Payment successfully completed!', {
+						position: 'top-right',
+					});
+				}, 2000);
+
+				spinnerOpen.value = false;
+			})
+			.catch((error) => {
+				$toast.error(error.message, { position: 'top-right' });
+				console.log(error);
+			});
 	};
 </script>
 
 <template>
 	<form
 		@submit="submitHandler"
-		class="min-w-screen min-h-screen relative bg-gray-200 flex items-center justify-center px-5 pb-10 pt-16"
+		class="min-w-screen min-h-screen relative bg-gray-200 flex items-center justify-center px-5 pb-10 pt-12"
 	>
 		<div
 			v-if="spinnerOpen"
@@ -111,21 +124,7 @@
 				<div
 					class="bg-indigo-500 text-white overflow-hidden rounded-full w-24 h-24 -mt-16 mx-auto shadow-lg flex justify-center items-center"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						xmlns:xlink="http://www.w3.org/1999/xlink"
-						height="400px"
-						width="400px"
-						version="1.1"
-						id="Capa_1"
-						viewBox="-150 -150 860 860"
-						xml:space="preserve"
-					>
-						<path
-							style="fill: #010002"
-							d="M482.797,276.924c4.53-5.824,6.73-13.331,4.724-20.988L428.05,30.521    c-3.451-13.029-16.847-20.837-29.854-17.386L18.184,113.331C5.22,116.761-2.61,130.2,0.798,143.207L60.269,368.6    c3.408,13.007,16.868,20.816,29.876,17.408l134.278-35.419v75.476c0,42.214,69.954,64.303,139.11,64.303    c69.113,0,139.153-22.089,139.153-64.302V311.61C502.685,297.869,495.157,286.307,482.797,276.924z M439.763,199.226l6.212,23.469    l-75.541,19.953l-6.169-23.512L439.763,199.226z M395.931,50.733l11.799,44.695l-118.014,31.148l-11.799-44.695L395.931,50.733z     M342.975,224.744l6.04,22.951c-27.934,1.251-55.113,6.126-76.943,14.452l-4.616-17.429L342.975,224.744z M79.984,319.224    l-6.169-23.426l75.519-19.975l6.212,23.555L79.984,319.224z M170.625,270.237l75.476-19.953l5.716,21.506    c-1.834,1.122-3.559,2.286-5.242,3.473l-69.781,18.421L170.625,270.237z M477.491,424.209c0,24.612-50.993,44.544-113.958,44.544    c-62.9,0-113.937-19.953-113.937-44.544v-27.718c0-0.928,0.539-1.769,0.69-2.653c3.602,23.34,52.654,41.847,113.247,41.847    c60.614,0,109.687-18.508,113.268-41.847c0.151,0.884,0.69,1.726,0.69,2.653V424.209z M477.491,369.678    c0,24.591-50.993,44.522-113.958,44.522c-62.9,0-113.937-19.931-113.937-44.522V341.96c0-0.906,0.539-1.769,0.69-2.653    c3.602,23.318,52.654,41.869,113.247,41.869c60.614,0,109.687-18.551,113.268-41.869c0.151,0.884,0.69,1.747,0.69,2.653V369.678z     M363.532,356.11c-62.9,0-113.937-19.931-113.937-44.501c0-24.569,51.036-44.5,113.937-44.5c62.965,0,113.958,19.931,113.958,44.5    C477.491,336.179,426.497,356.11,363.532,356.11z"
-						/>
-					</svg>
+					<font-awesome-icon class="fa-3x" icon="fa-solid fa-money-check" />
 				</div>
 			</div>
 			<div class="mb-10">
@@ -133,7 +132,7 @@
 			</div>
 			<div class="mb-3">
 				<label class="font-bold text-sm mb-2 ml-1">Your name</label>
-				{{ name }}
+				{{ isFormValid }}
 				<div>
 					<input
 						class="w-full px-3 py-2 mb-1 border-2 border-gray-200 rounded-md focus:outline-none focus:border-indigo-500 transition-colors"
@@ -171,7 +170,7 @@
 					/>
 					<p
 						class="text-red-400/100 px-3"
-						v-if="!emailValid && emailValue.length > 4"
+						v-if="!emailValid && emailValue.length > 3"
 					>
 						Please enter valid email
 					</p>
@@ -190,7 +189,7 @@
 					/>
 					<p
 						class="text-red-400/100 px-3"
-						v-if="!creditCardValid && cardNumber.length > 4"
+						v-if="!creditCardValid && cardNumber.length > 0"
 					>
 						Please enter valid card number
 					</p>
@@ -265,10 +264,16 @@
 			<div>
 				<button
 					type="submit"
+					@click="submitHandler"
 					class="block w-full max-w-xs mx-auto bg-indigo-500 hover:bg-indigo-700 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
 				>
 					<i class="mdi mdi-lock-outline mr-1"></i> PAY NOW
 				</button>
+
+				<p class="text-left pt-4 text-xs opacity-50">
+					By making a payment, you are deemed to have accepted
+					<strong>Terms of Use</strong> and <strong>Privacy Policy</strong>
+				</p>
 			</div>
 		</div>
 	</form>
