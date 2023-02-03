@@ -32,7 +32,6 @@
 		const newArray = seats.flat().filter((seat) => seat.Active);
 
 		updateEventState('seats', newArray);
-		localStorage.setItem('seats', JSON.stringify(occupiedSeats.value));
 
 		return newArray;
 	});
@@ -72,11 +71,13 @@
 	};
 
 	const goToPayment = () => {
-		if (store.state.seats.length > 0) {
+		if (store.state.seats.length > 0 && occupiedSeats.value.length > 0) {
 			spinnerOpen.value = true;
 
 			setTimeout(() => {
 				spinnerOpen.value = false;
+				localStorage.setItem('seats', JSON.stringify(occupiedSeats.value));
+
 				router.push(`/payment`);
 				updateEventState('step', 3);
 				localStorage.setItem('step', 3);

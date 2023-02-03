@@ -6,6 +6,7 @@ import './style.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import 'vue-select/dist/vue-select.css';
 
 import VueSelect from 'vue-select';
 

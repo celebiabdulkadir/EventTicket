@@ -1,11 +1,18 @@
 <script setup>
 	import { useRoute, useRouter } from 'vue-router';
+	import { useStore } from 'vuex';
+	const store = useStore();
 
 	const router = useRouter();
+
+	const updateEventState = (key, value) => {
+		store.commit('update', [key, value]);
+	};
 
 	const goHomeButton = () => {
 		router.push(`/`);
 		localStorage.clear();
+		updateEventState('clear');
 		localStorage.setItem('step', 0);
 	};
 </script>
