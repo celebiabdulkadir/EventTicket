@@ -55,7 +55,11 @@
 							></path>
 						</svg>
 					</a>
-					<a href="https://github.com/celebiabdulkadir" class="text-gray-800">
+					<a
+						target="_blank"
+						href="https://github.com/celebiabdulkadir"
+						class="text-gray-800"
+					>
 						<svg
 							aria-hidden="true"
 							focusable="false"

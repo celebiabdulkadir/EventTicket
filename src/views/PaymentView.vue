@@ -6,9 +6,15 @@
 	import { useToast } from 'vue-toast-notification';
 	import Spinner from '../components/Spinner.vue';
 	import 'vue-toast-notification/dist/theme-sugar.css';
+
+	import moment from 'moment';
 	const $toast = useToast();
 	const spinnerOpen = ref(false);
 	const cardNumber = ref('');
+
+	const calculateTotalPrice = computed(() => {
+		return localStorage.getItem('totalPrice') ?? store.state.totalPrice;
+	});
 	const emailValue = ref('');
 	const cvvNum = ref('');
 	const creditCardExpMonth = ref('');
@@ -45,12 +51,35 @@
 		);
 	});
 
+	const monthYear = computed(() => {
+		const result = `01/${creditCardExpMonth.value}/${creditCardExpYear.value}`;
+		console.log('result: ', result);
+		return moment(result).format('DD/MM/YYYY');
+	});
+
+	console.log(creditCardExpMonth.value);
+	console.log(creditCardExpYear.value);
+	const dateValid = computed(() => {
+		const currentDate = moment(new Date()).format('DD/MM/YYYY');
+
+		const expDate = moment(monthYear.value);
+
+		const difference = expDate.diff(currentDate, 'months');
+
+		if (difference >= -2) {
+			return true;
+		}
+
+		console.log('difference', difference);
+	});
+
 	const securityCodeValid = computed(() => {
 		return /^[0-9]{3,4}$/.test(cvvNum.value);
 	});
 
 	const isFormValid = computed(() => {
 		if (
+			dateValid.value &&
 			creditCardValid.value &&
 			emailValid.value &&
 			creditCardExpMonth.value !== '' &&
@@ -65,6 +94,8 @@
 
 	const updateCardValue = (e) => {
 		cardNumber.value = e.target.value.replace(/ /g, '');
+		console.log(creditCardExpMonth.value);
+		console.log(creditCardExpYear.value);
 		updateEventState('cc_number', cardNumber.value);
 	};
 	const formatCardNumber = computed(() => {
@@ -240,6 +271,7 @@
 						</select>
 					</div>
 				</div>
+
 				<div class="px-2 w-1/2">
 					<select
 						required
@@ -247,19 +279,25 @@
 						@input="updateEventState('cc_exp_year', $event.target.value)"
 						class="form-select w-full px-3 py-2 mb-1 border-2 border-gray-200 rounded-md focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
 					>
-						<option value="2020">2023</option>
-						<option value="2021">2024</option>
-						<option value="2022">2025</option>
-						<option value="2023">2026</option>
-						<option value="2024">2027</option>
-						<option value="2025">2028</option>
-						<option value="2026">2029</option>
-						<option value="2027">2030</option>
-						<option value="2028">2031</option>
-						<option value="2029">2032</option>
+						<option value="2023">2023</option>
+						<option value="2024">2024</option>
+						<option value="2025">2025</option>
+						<option value="2026">2026</option>
+						<option value="2027">2027</option>
+						<option value="2028">2028</option>
+						<option value="2029">2029</option>
+						<option value="2030">2030</option>
+						<option value="2031">2031</option>
+						<option value="2032">2032</option>
 					</select>
 				</div>
 			</div>
+			<p
+				class="text-red-400/100 px-3"
+				v-if="!dateValid && creditCardExpYear.length > 0"
+			>
+				Please enter valid date
+			</p>
 			<div class="mb-6">
 				<label class="font-bold text-sm mb-2 ml-1">Security code</label>
 
@@ -285,7 +323,7 @@
 					<h1 class="mr-2 text-xs font-bold">TOTAL PRICE</h1>
 					<h1>
 						<strong class="text-2xl font-bold"
-							>₺{{ store.state.totalPrice }}
+							>₺{{ calculateTotalPrice }}
 						</strong>
 					</h1>
 				</div>

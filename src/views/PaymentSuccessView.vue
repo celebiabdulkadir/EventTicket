@@ -1,5 +1,8 @@
 <script setup>
 	import { useRoute, useRouter } from 'vue-router';
+	import { useStore } from 'vuex';
+
+	const store = useStore();
 
 	const goToHomePage = () => {
 		localStorage.clear();
@@ -14,8 +17,10 @@
 </script>
 
 <template>
-	<div class="bg-indigo-100 h-screen">
-		<div class="bg-indigo-100 p-6 md:mx-auto">
+	<div class="bg-indigo-100">
+		<div
+			class="bg-indigo-100 p-6 md:mx-auto justify-center items-center align-middle"
+		>
 			<svg viewBox="0 0 24 24" class="text-green-600 w-16 h-16 mx-auto my-6">
 				<path
 					fill="currentColor"
@@ -31,7 +36,27 @@
 				<p class="text-gray-600 my-2">
 					Thank you for completing your online payment.
 				</p>
-				<p>Have a great day!</p>
+				<p class="mb-6">Have a great day!</p>
+
+				<div class="border-2 flex flex-col justify-center">
+					<div class="flex flex-row justify-center">
+						<p class="mr-6">Payment Amount:</p>
+						<p class="font-bold">₺{{ store.state.totalPrice }}</p>
+					</div>
+					<div class="flex flex-row justify-center">
+						<p class="mr-6">Category :</p>
+						<p>{{ store.state.eventCategoryName }}</p>
+					</div>
+					<div class="flex flex-row justify-center">
+						<p class="mr-6">Tickets:</p>
+						<button
+							class="px-2 mx-2 bg-indigo-500 rounded"
+							v-for="item in store.state.seats"
+						>
+							{{ item.seat }}-{{ item.row }}
+						</button>
+					</div>
+				</div>
 				<div class="py-10 text-center">
 					<button
 						@click="goToHomePage"

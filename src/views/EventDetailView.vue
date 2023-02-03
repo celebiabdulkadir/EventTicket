@@ -41,7 +41,7 @@
 			categoryId.value === 'null' ||
 			categoryId.value === ''
 		) {
-			$toast.error('please  select a category', { position: 'top-right' });
+			$toast.error('Please  select a category', { position: 'top-right' });
 			return;
 		} else {
 			const category = categoryList.value.find(
@@ -82,14 +82,14 @@
 
 <template>
 	<div
+		v-if="spinnerOpen"
+		class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
+	>
+		<Spinner class="absolute right-1/2 top-1/2"></Spinner>
+	</div>
+	<div
 		class="flex relative flex-col justify-center mobile:mx-2 align-middle items-center bg-indigo-100"
 	>
-		<div
-			v-if="spinnerOpen"
-			class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
-		>
-			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
-		</div>
 		<div
 			class="desktop:mx-2 desktop:my-2 desktop:max-w-[500px] mobile:w-full h-full"
 		>
@@ -129,9 +129,8 @@
 			</p>
 
 			<div class="flex flex-col my-4 desktop:w-[500px] mobile:w-full">
-				<label class="mt-2 mb-4" for="category">Select a category :</label>
-
 				<v-select
+					class="bg-white"
 					v-model="categoryId"
 					placeholder="Please Select a Category"
 					:reduce="(x) => x.id"
@@ -141,18 +140,12 @@
 					"
 				>
 				</v-select>
-				<p class="text-red-300 opacity-60" v-if="categoryId.length < 1">
+				<p class="text-red-300" v-if="categoryId.length < 1">
 					*Please select a category
 				</p>
 			</div>
 
-			<div class="flex flex-row justify-between my-2">
-				<button
-					class="bg-red-300 inline-block hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-					@click="goBack"
-				>
-					<font-awesome-icon icon="fa-solid fa-circle-arrow-left" /> Back
-				</button>
+			<div class="flex flex-row justify-end my-2">
 				<button
 					@click="goToPayment"
 					class="bg-indigo-500 inline-block hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"

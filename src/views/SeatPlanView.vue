@@ -127,6 +127,12 @@
 
 <template>
 	<div
+		v-if="spinnerOpen"
+		class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
+	>
+		<Spinner class="absolute right-1/2 top-1/2"></Spinner>
+	</div>
+	<div
 		class="bg-indigo-100 min-h-[60vh] desktop:px-16 relative w-full flex desktop:flex-row mobile:flex-col align-middle items-center justify-center desktop:space-x-28"
 	>
 		<div class="flex flex-start justify-end">
@@ -138,14 +144,9 @@
 				Back
 			</button>
 		</div>
+
 		<div
-			v-if="spinnerOpen"
-			class="absolute bg-gray-50 opacity-90 w-full h-full z-20"
-		>
-			<Spinner class="absolute right-1/2 top-1/2"></Spinner>
-		</div>
-		<div
-			class="flex flex-row min-h-[30vh] w-full overflow-auto align-middle items-center bg-white rounded-md shadow-3xl my-8"
+			class="flex flex-row min-h-[30vh] w-full overflow-auto align-middle items-center bg-white rounded-md my-8"
 		>
 			<div class="justify-center flex flex-col w-full">
 				<h1 class="text-center my-2 font-bold text-xl">Seat Selection</h1>
@@ -188,7 +189,7 @@
 		</div>
 		<div
 			:class="[occupiedSeats.length > 0 ? 'min-h-[45vh]' : 'min-h-[32vh]']"
-			class="flex flex-col align-middle justify-start min-h-[45vh] desktop:w-96 mobile:w-full bg-white rounded-md my-8 shadow-3xl"
+			class="flex flex-col align-middle justify-start min-h-[45vh] desktop:w-96 mobile:w-full bg-white rounded-md my-8"
 		>
 			<div class="flex flex-col justify-start mx-4">
 				<h1 class="my-2 font-bold text-xl mx-4">
