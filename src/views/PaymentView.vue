@@ -305,6 +305,8 @@
 						placeholder="000"
 						type="text"
 						required
+						maxlength="4"
+						onkeypress="return /^[0-9]*$/i.test(event.key)"
 						v-model="cvvNum"
 						@input="updateEventState('cc_exp_cvv', $event.target.value)"
 					/>
