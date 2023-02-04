@@ -53,12 +53,9 @@
 
 	const monthYear = computed(() => {
 		const result = `01/${creditCardExpMonth.value}/${creditCardExpYear.value}`;
-		console.log('result: ', result);
 		return moment(result).format('DD/MM/YYYY');
 	});
 
-	console.log(creditCardExpMonth.value);
-	console.log(creditCardExpYear.value);
 	const dateValid = computed(() => {
 		const currentDate = moment(new Date()).format('DD/MM/YYYY');
 
@@ -69,8 +66,6 @@
 		if (difference >= -2) {
 			return true;
 		}
-
-		console.log('difference', difference);
 	});
 
 	const securityCodeValid = computed(() => {
@@ -94,8 +89,7 @@
 
 	const updateCardValue = (e) => {
 		cardNumber.value = e.target.value.replace(/ /g, '');
-		console.log(creditCardExpMonth.value);
-		console.log(creditCardExpYear.value);
+
 		updateEventState('cc_number', cardNumber.value);
 	};
 	const formatCardNumber = computed(() => {
@@ -127,9 +121,12 @@
 			.then((res) => {
 				setTimeout(() => {
 					updateEventState('step', 4);
-					router.push('/paymentsuccess');
-
 					localStorage.setItem('step', 4);
+					updateEventState('name', name.value);
+					localStorage.setItem('name', name.value);
+					updateEventState('surname', surname.value);
+					localStorage.setItem('surname', surname.value);
+					router.push('/paymentsuccess');
 
 					$toast.success('Payment successfully completed!', {
 						position: 'top-right',
@@ -236,6 +233,7 @@
 						:value="formatCardNumber"
 						maxlength="19"
 						required
+						onkeypress="return /^[0-9]*$/i.test(event.key)"
 						@input="updateCardValue"
 					/>
 					<p

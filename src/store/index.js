@@ -3,6 +3,8 @@ import { createStore } from 'vuex';
 const store = createStore({
 	state: {
 		step: 0,
+		name: '',
+		surname: '',
 		eventId: '',
 		eventCategoryId: '',
 		eventCategoryName: '',
@@ -24,6 +26,8 @@ const store = createStore({
 		clear(state) {
 			state = {
 				step: 0,
+				name: '',
+				surname: '',
 				eventId: '',
 				eventCategoryId: '',
 				eventCategoryName: '',
