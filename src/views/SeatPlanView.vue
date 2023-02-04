@@ -170,9 +170,6 @@
 										@click="seat.Active = !seat.Active"
 										class="text-white font-bold py-2 px-2 rounded-full w-12 m-2"
 										:class="[
-											!seat.isBooked
-												? 'bg-gray-200 contrast-125 text-stone-600'
-												: 'bg-gray-600 contrast-125',
 											!seat.Active
 												? 'bg-green-200 contrast-125 text-stone-600'
 												: 'bg-green-600 contrast-125',
