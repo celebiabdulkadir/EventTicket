@@ -4,16 +4,17 @@
 	import { useStore } from 'vuex';
 
 	const store = useStore();
-
+	// In order to show Total Amount of payment
 	const calculateTotalPrice = computed(() => {
 		return localStorage.getItem('totalPrice') ?? store.state.totalPrice;
 	});
-
+	//  In order to show Selected seats
 	const selectedSeats = computed(() => {
 		const seats =
 			JSON.parse(localStorage.getItem('seats')) ?? store.state.seats;
 		return seats;
 	});
+	// In order to show selected event category
 
 	const eventCategory = computed(() => {
 		const category =
@@ -21,6 +22,7 @@
 			store.state.eventCategoryName;
 		return category;
 	});
+	// In order to show User information
 
 	const nameSurname = computed(() => {
 		const name = localStorage.getItem('name') ?? store.state.name;
@@ -29,7 +31,6 @@
 		const fullName = `${name} ${surname}`;
 		return fullName;
 	});
-
 	const goToHomePage = () => {
 		localStorage.clear();
 		localStorage.setItem('step', 0);

@@ -12,13 +12,17 @@
 	const events = ref([]);
 
 	const router = useRouter();
+
 	const spinnerOpen = ref(false);
 
 	const store = useStore();
+
+	// method for updating state
+
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
-
+	// method for go to details page
 	const handleClick = (id) => {
 		updateEventState('eventId', id);
 

@@ -24,18 +24,20 @@
 	const route = useRoute();
 	const router = useRouter();
 	const store = useStore();
+	// method for updating state
 
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
+	// Back button funtion to go previous page
 
 	const goBack = () => {
 		router.go(-1);
 		store.commit('clear');
 		localStorage.clear();
 	};
-
-	const goToPayment = () => {
+	// Method for going to seat selection
+	const goToSeatSelection = () => {
 		if (
 			categoryId.value === 'undefined' ||
 			categoryId.value === 'null' ||
@@ -147,7 +149,7 @@
 
 			<div class="flex flex-row justify-end my-2">
 				<button
-					@click="goToPayment"
+					@click="goToSeatSelection"
 					class="bg-indigo-500 inline-block hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
 				>
 					Go to seat plan <font-awesome-icon icon="fa-solid fa-circle-right" />

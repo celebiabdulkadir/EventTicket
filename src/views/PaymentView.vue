@@ -12,6 +12,13 @@
 	const spinnerOpen = ref(false);
 	const cardNumber = ref('');
 
+	// method for updating state
+	const updateEventState = (key, value) => {
+		store.commit('update', [key, value]);
+	};
+
+	//Calculatin for total price
+
 	const calculateTotalPrice = computed(() => {
 		return localStorage.getItem('totalPrice') ?? store.state.totalPrice;
 	});
@@ -24,6 +31,7 @@
 
 	const store = useStore();
 
+	// Back button funtion to go previous page
 	const goBack = () => {
 		router.go(-1);
 		localStorage.setItem('step', 2);
@@ -35,27 +43,26 @@
 		store.commit('update', ['totalPrice', '']);
 		store.commit('update', ['seats', '[]']);
 	};
+	// Validation for email
 	const emailValid = computed(() => {
 		return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,6})+$/.test(
 			emailValue.value
 		);
 	});
-
-	const updateEventState = (key, value) => {
-		store.commit('update', [key, value]);
-	};
-
+	// Validation for Credit  Card
 	const creditCardValid = computed(() => {
 		return /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}(?:2131|1800|35\d{3})\d{11})$/.test(
 			cardNumber.value
 		);
 	});
 
+	// Method for formattin input date and year of user
+
 	const monthYear = computed(() => {
 		const result = `01/${creditCardExpMonth.value}/${creditCardExpYear.value}`;
 		return moment(result).format('DD/MM/YYYY');
 	});
-
+	// Validation for date
 	const dateValid = computed(() => {
 		const currentDate = moment(new Date()).format('DD/MM/YYYY');
 
@@ -67,11 +74,11 @@
 			return true;
 		}
 	});
-
+	// Validation for CVV
 	const securityCodeValid = computed(() => {
 		return /^[0-9]{3,4}$/.test(cvvNum.value);
 	});
-
+	// Validation for All form inputs
 	const isFormValid = computed(() => {
 		if (
 			dateValid.value &&
@@ -87,14 +94,16 @@
 		} else false;
 	});
 
+	// Method for splitting 4 character
+	const formatCardNumber = computed(() => {
+		return cardNumber.value ? cardNumber.value.match(/.{1,4}/g).join(' ') : '';
+	});
+	// Method  for join characters after splitting
 	const updateCardValue = (e) => {
 		cardNumber.value = e.target.value.replace(/ /g, '');
 
 		updateEventState('cc_number', cardNumber.value);
 	};
-	const formatCardNumber = computed(() => {
-		return cardNumber.value ? cardNumber.value.match(/.{1,4}/g).join(' ') : '';
-	});
 
 	const submitHandler = (e) => {
 		e.preventDefault();

@@ -9,5 +9,3 @@
 	<div class="mobile:mb-[80px]"><RouterView class="overflow-auto" /></div>
 	<FooterComp class="app-footer"></FooterComp>
 </template>
-
-<style></style>

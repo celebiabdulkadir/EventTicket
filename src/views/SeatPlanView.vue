@@ -16,10 +16,12 @@
 	const spinnerOpen = ref(false);
 
 	const store = useStore();
+	// method for updating state
 
 	const updateEventState = (key, value) => {
 		store.commit('update', [key, value]);
 	};
+	// Back button funtion to go previous page
 
 	const goBack = () => {
 		router.go(-1);
@@ -37,12 +39,14 @@
 
 		localStorage.removeItem('eventCategoryId');
 	};
-
+	// In order to display category name in template
 	const categoryName =
 		localStorage.getItem('eventCategoryName') ?? store.state.eventCategoryName;
 
-	const categoryPrice = localStorage.getItem('price') ?? store.state.price;
+	// In order to display category name in template
 
+	const categoryPrice = localStorage.getItem('price') ?? store.state.price;
+	// Method which filter selected seats
 	const occupiedSeats = computed(() => {
 		const seats = newSeatPlan.value.map((element) => element.seats);
 
@@ -52,7 +56,7 @@
 
 		return newArray;
 	});
-
+	// Method of calculation of total amount
 	const calculateTotal = computed(() => {
 		const total =
 			store.state.seats.length *
@@ -62,6 +66,7 @@
 		return total;
 	});
 
+	// Method for manipulating data by Rows
 	const getRows = () => {
 		const rows = seatPlan.value.map((element) => element.row);
 		let uniqueRows = [...new Set(rows)];
@@ -86,7 +91,6 @@
 		newSeatPlan.value = newArray;
 		return newArray;
 	};
-
 	const goToPayment = () => {
 		if (store.state.seats.length > 0 && occupiedSeats.value.length > 0) {
 			spinnerOpen.value = true;
