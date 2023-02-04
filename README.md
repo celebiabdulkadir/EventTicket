@@ -59,6 +59,7 @@ In this screen, all events are listed. You can click 'See Detail' buttons to go 
 - Vue 3 composition API
 - Vue-router
 - Vuex
+- Tailwind
 - Vue tost notification
 - Vue-Select
 
