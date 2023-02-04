@@ -1,8 +1,34 @@
 <script setup>
+	import { computed } from '@vue/reactivity';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useStore } from 'vuex';
 
 	const store = useStore();
+
+	const calculateTotalPrice = computed(() => {
+		return localStorage.getItem('totalPrice') ?? store.state.totalPrice;
+	});
+
+	const selectedSeats = computed(() => {
+		const seats =
+			JSON.parse(localStorage.getItem('seats')) ?? store.state.seats;
+		return seats;
+	});
+
+	const eventCategory = computed(() => {
+		const category =
+			localStorage.getItem('eventCategoryName') ??
+			store.state.eventCategoryName;
+		return category;
+	});
+
+	const nameSurname = computed(() => {
+		const name = localStorage.getItem('name') ?? store.state.name;
+		const surname = localStorage.getItem('surname') ?? store.state.surname;
+
+		const fullName = `${name} ${surname}`;
+		return fullName;
+	});
 
 	const goToHomePage = () => {
 		localStorage.clear();
@@ -11,16 +37,12 @@
 		router.push(`/`);
 	};
 
-	const summary = () => {};
-
 	const router = useRouter();
 </script>
 
 <template>
 	<div class="bg-indigo-100">
-		<div
-			class="bg-indigo-100 p-6 md:mx-auto justify-center items-center align-middle"
-		>
+		<div class="bg-indigo-100 p-6 md:mx-auto justify-center items-center">
 			<svg viewBox="0 0 24 24" class="text-green-600 w-16 h-16 mx-auto my-6">
 				<path
 					fill="currentColor"
@@ -34,27 +56,41 @@
 					Payment Done!
 				</h3>
 				<p class="text-gray-600 my-2">
-					Thank you for completing your online payment.
+					Thanks
+					<strong>{{ nameSurname }}</strong> for completing your online payment.
 				</p>
-				<p class="mb-6">Have a great day!</p>
+				<div class="flex align-baseline justify-center items-center">
+					<p
+						class="mb-6 border-b-[1px] border-indigo-300 pb-4 text-center w-72"
+					>
+						Have a great day!
+					</p>
+				</div>
 
-				<div class="border-2 flex flex-col justify-center">
-					<div class="flex flex-row justify-center">
-						<p class="mr-6">Payment Amount:</p>
-						<p class="font-bold">₺{{ store.state.totalPrice }}</p>
-					</div>
-					<div class="flex flex-row justify-center">
-						<p class="mr-6">Category :</p>
-						<p>{{ store.state.eventCategoryName }}</p>
-					</div>
-					<div class="flex flex-row justify-center">
-						<p class="mr-6">Tickets:</p>
-						<button
-							class="px-2 mx-2 bg-indigo-500 rounded"
-							v-for="item in store.state.seats"
-						>
-							{{ item.seat }}-{{ item.row }}
-						</button>
+				<div class="flex flex-col justify-center align-middle items-center">
+					<div class="w-72">
+						<p class="mb-6 border-b-[1px] pb-4 my-2 border-indigo-300">
+							Payment Summary :
+						</p>
+						<div class="flex flex-row mobile:justify-between mb-2">
+							<p class="mr-6">Payment Amount:</p>
+							<p class="font-bold">₺{{ calculateTotalPrice }}</p>
+						</div>
+						<div class="flex flex-row mobile:justify-between mb-2">
+							<p class="mr-6">Category :</p>
+							<p>{{ eventCategory }}</p>
+						</div>
+						<div class="flex flex-row mobile:justify-between">
+							<p class="mr-2">Tickets:</p>
+							<p class="text-left">
+								<button
+									class="px-2 mx-2 my-2 bg-green-600 contrast-125 rounded"
+									v-for="item in selectedSeats"
+								>
+									{{ item.seat }}-{{ item.row }}
+								</button>
+							</p>
+						</div>
 					</div>
 				</div>
 				<div class="py-10 text-center">

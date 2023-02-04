@@ -21,7 +21,7 @@
 	<header>
 		<div class="flex items-center flex-shrink-0 text-white bg-indigo-500 p-4">
 			<font-awesome-icon
-				class="fa-2x desktop:mx-6 mobile:mx-0"
+				class="fa-2x desktop:mx-6 mobile:mr-2"
 				icon="fa-solid fa-ticket"
 			/>
 

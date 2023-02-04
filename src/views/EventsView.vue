@@ -88,7 +88,7 @@
 					{{ item.title }}
 				</h1>
 			</div>
-			<div class="px-6 pt-4 pb-2 min-h-[9.5vh]">
+			<div class="px-6 pt-4 pb-2 desktop:min-h-[9.5vh]">
 				<font-awesome-icon class="mr-2" icon="fa-solid fa-map-location" />
 				<span>{{ item.venue.name }}</span>
 			</div>
