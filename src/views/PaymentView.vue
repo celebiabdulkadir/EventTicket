@@ -52,18 +52,23 @@
 	});
 
 	const monthYear = computed(() => {
-		const result = `01/${creditCardExpMonth.value}/${creditCardExpYear.value}`;
-		return moment(result).format('DD/MM/YYYY');
+
+		const newResult = new Date(creditCardExpYear.value,creditCardExpMonth.value-1,1)
+		console.log(newResult)
+		return newResult
 	});
 
 	const dateValid = computed(() => {
-		const currentDate = moment(new Date()).format('DD/MM/YYYY');
+		const currentDate = moment(new Date())
+		
 
 		const expDate = moment(monthYear.value);
+		
 
 		const difference = expDate.diff(currentDate, 'months');
+		console.log(difference)
 
-		if (difference >= -2) {
+		if (difference > 0) {
 			return true;
 		}
 	});
