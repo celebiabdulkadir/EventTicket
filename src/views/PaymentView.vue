@@ -54,7 +54,6 @@
 	const monthYear = computed(() => {
 
 		const newResult = new Date(creditCardExpYear.value,creditCardExpMonth.value-1,1)
-		console.log(newResult)
 		return newResult
 	});
 
@@ -66,7 +65,6 @@
 		
 
 		const difference = expDate.diff(currentDate, 'months');
-		console.log(difference)
 
 		if (difference > 0) {
 			return true;
