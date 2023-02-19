@@ -53,7 +53,10 @@
 
 	const monthYear = computed(() => {
 
-		const newResult = new Date(creditCardExpYear.value,creditCardExpMonth.value-1,1)
+
+
+// Determine the last day of exp month
+		const newResult = new Date(creditCardExpYear.value,creditCardExpMonth.value,0)
 		return newResult
 	});
 
@@ -64,9 +67,9 @@
 		const expDate = moment(monthYear.value);
 		
 
-		const difference = expDate.diff(currentDate, 'months');
+		const difference = expDate.diff(currentDate, 'days');
 
-		if (difference > 0) {
+		if (difference >= 0) {
 			return true;
 		}
 	});
